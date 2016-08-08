@@ -39,7 +39,7 @@
     "coveralls": "2.11.12",
     "cz-conventional-changelog": "1.1.7",
     "in-publish": "2.0.0",
-    "mocha": "3.0.0",
+    "mocha": "3.0.2",
     "nock": "8.0.0",
     "nyc": "7.1.0",
     "rimraf": "2.5.4",
