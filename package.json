@@ -37,7 +37,7 @@
   "devDependencies": {
     "chai": "3.5.0",
     "coveralls": "2.11.12",
-    "cz-conventional-changelog": "1.1.7",
+    "cz-conventional-changelog": "1.2.0",
     "in-publish": "2.0.0",
     "mocha": "3.0.2",
     "nock": "8.0.0",
