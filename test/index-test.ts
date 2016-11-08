@@ -7,6 +7,8 @@ import { Pretend, Get, Post, Put, Delete } from '../src';
 class Test {
   @Get('/path/{id}')
   public async get(id: string): Promise<any> {}
+  @Get('/path/{id}', true)
+  public async getWithQuery(id: string, parameters: any): Promise<any> {}
   @Post('/path')
   public async post(body: any): Promise<any> {}
   @Put('/path')
@@ -28,6 +30,12 @@ test('Pretend should call a get method', async t => {
   const test = setup();
   nock('http://host:port/').get('/path/id').reply(200, response);
   t.deepEqual(await test.get('id'), response);
+});
+
+test('Pretend should call a get method with query parameters', async t => {
+  const test = setup();
+  nock('http://host:port/').get('/path/id?a=b&c=d').reply(200, response);
+  t.deepEqual(await test.getWithQuery('id', {a: 'b', c: 'd'}), response);
 });
 
 test('Pretend should call a post method', async t => {

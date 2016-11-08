@@ -17,6 +17,7 @@ A decorator based http webservice client build with typescript (inspired bei fei
 * Configure a decoder (defaults to JSON)
 * Request interceptors
 * Basic authentication
+* Request parameters (currently on GET requests)
 
 ## Usage
 
@@ -33,8 +34,8 @@ npm install pretend --save
 ```js
 class Test {
 
-  @Get('/path/{id}')
-  public async get(id: string) {}
+  @Get('/path/{id}', true)
+  public async get(id: string, parameters: any) {}
 
   @Post('/path')
   public async post(body: any) {}
@@ -51,9 +52,10 @@ async function call() {
   const client = Pretend
                   .builder()
                   .target(Test, 'http://host:port/');
-  const result = await client.get('some-id');
+  const result = await client.get('some-id', {'name': 'value'});
 }
 
+// Executes a GET request to 'http://host:port/path/some-id?name=value'
 call();
 
 ```

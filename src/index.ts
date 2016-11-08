@@ -19,26 +19,42 @@ function createUrl(url: string, args: any[]): [string, number] {
     .join('/'), i];
 }
 
-async function execute(config: IPretendConfiguration, method: string, tmpl: string, args: any[]): Promise<any> {
-  const urlData = createUrl(tmpl, args);
+function createQuery(parameters: any): string {
+  return Object.keys(parameters)
+    .reduce((query, name) => {
+      return `${query}&${name}=${encodeURIComponent(parameters[name])}`;
+    }, '')
+    .replace(/^&/, '?');
+}
+
+function buildUrl(tmpl: string, args: any[], appendQuery: boolean): [string, number] {
+  const [url, queryOrBodyIndex] = createUrl(tmpl, args);
+  const query = createQuery(appendQuery ? args[queryOrBodyIndex] : {});
+  return [`${url}${query}`, queryOrBodyIndex];
+}
+
+async function execute(config: IPretendConfiguration, method: string, tmpl: string, args: any[], sendBody: boolean,
+    appendQuery: boolean): Promise<any> {
+  const [url, queryOrBodyIndex] = buildUrl(tmpl, args, appendQuery);
   const request = config.requestInterceptors
     .reduce<IPretendRequest>((data, interceptor) => interceptor(data), {
-      url: urlData[0],
+      url,
       options: {
         method,
         headers: {},
-        body: JSON.stringify(args[urlData[1]])
+        body: sendBody ? JSON.stringify(args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex]) : undefined
       }
     });
   const response = await fetch(request.url, request.options);
   return config.decoder(response);
 }
 
-function decoratorFactory(method: string, url: string): MethodDecorator {
+function decoratorFactory(method: string, url: string, sendBody: boolean, appendQuery: boolean): MethodDecorator {
   return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
     descriptor.value = async function(): Promise<any> {
       const config = this.__Pretend__ as IPretendConfiguration;
-      return execute(config, method, `${config.baseUrl}${url}`, Array.prototype.slice.call(arguments));
+      return execute(config, method, `${config.baseUrl}${url}`, Array.prototype.slice.call(arguments), sendBody,
+        appendQuery);
     };
     return descriptor;
   };
@@ -93,18 +109,18 @@ export class Pretend {
 
 }
 
-export function Get(url: string): MethodDecorator {
-  return decoratorFactory('GET', url);
+export function Get(url: string, appendQuery = false): MethodDecorator {
+  return decoratorFactory('GET', url, false, appendQuery);
 }
 
 export function Post(url: string): MethodDecorator {
-  return decoratorFactory('POST', url);
+  return decoratorFactory('POST', url, true, false);
 }
 
 export function Put(url: string): MethodDecorator {
-  return decoratorFactory('PUT', url);
+  return decoratorFactory('PUT', url, true, false);
 }
 
 export function Delete(url: string): MethodDecorator {
-  return decoratorFactory('DELETE', url);
+  return decoratorFactory('DELETE', url, false, false);
 }
