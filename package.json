@@ -50,9 +50,6 @@
     "isomorphic-fetch": "2.2.1",
     "omni-fetch": "0.1.1"
   },
-  "publishConfig": {
-    "tag": "next"
-  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

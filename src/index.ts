@@ -15,7 +15,7 @@ function createUrl(url: string, args: any[]): [string, number] {
   let i = 0;
   return [url
     .split('/')
-    .map(part => part.startsWith('{') && i <= args.length ? args[i++] : part)
+    .map(part => (part.startsWith(':') || part.startsWith('{')) && i <= args.length ? args[i++] : part)
     .join('/'), i];
 }
 

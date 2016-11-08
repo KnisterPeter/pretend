@@ -11,8 +11,8 @@ class Test {
   public async post(body: any): Promise<any> {}
   @Put('/path')
   public async put(): Promise<any> {}
-  @Delete('/path')
-  public async delete(): Promise<any> {}
+  @Delete('/path/:id')
+  public async delete(id: string): Promise<any> {}
 }
 /* tslint:enable */
 
@@ -44,15 +44,15 @@ test('Pretend should call a put method', async t => {
 
 test('Pretend should call a delete method', async t => {
   const test = setup();
-  nock('http://host:port/').delete('/path').reply(200, response);
-  t.deepEqual(await test.delete(), response);
+  nock('http://host:port/').delete('/path/id').reply(200, response);
+  t.deepEqual(await test.delete('id'), response);
 });
 
 test('Pretend should throw on error', async t => {
   const test = setup();
-  nock('http://host:port/').delete('/path').replyWithError('server-fail');
+  nock('http://host:port/').delete('/path/id').replyWithError('server-fail');
   try {
-    await test.delete();
+    await test.delete('id');
     t.fail('should throw');
   } catch (e) {
     // Ignore here

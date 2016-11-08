@@ -11,29 +11,24 @@
 
 A decorator based http webservice client build with typescript (inspired bei feign).
 
-# Features
+## Features
 
 * Handle REST based webservices
 * Configure a decoder (defaults to JSON)
 * Request interceptors
 * Basic authentication
 
-# Usage
+## Usage
 
-## Installation
+### Installation
+
 Install as npm package:
 
 ```sh
 npm install pretend --save
 ```
 
-Install latest development version:
-
-```sh
-npm install pretend@next --save
-```
-
-## API
+### API
 
 ```js
 class Test {
@@ -47,8 +42,8 @@ class Test {
   @Put('/path')
   public async put() {}
 
-  @Delete('/path')
-  public async delete() {}
+  @Delete('/path/:id')
+  public async delete(id: string) {}
 
 }
 
