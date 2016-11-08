@@ -28,14 +28,18 @@ function createQuery(parameters: any): string {
 }
 
 function buildUrl(tmpl: string, args: any[], appendQuery: boolean): [string, number] {
-  const [url, queryOrBodyIndex] = createUrl(tmpl, args);
+  const createUrlResult = createUrl(tmpl, args);
+  const url = createUrlResult[0];
+  const queryOrBodyIndex = createUrlResult[1];
   const query = createQuery(appendQuery ? args[queryOrBodyIndex] : {});
   return [`${url}${query}`, queryOrBodyIndex];
 }
 
 async function execute(config: IPretendConfiguration, method: string, tmpl: string, args: any[], sendBody: boolean,
     appendQuery: boolean): Promise<any> {
-  const [url, queryOrBodyIndex] = buildUrl(tmpl, args, appendQuery);
+  const createUrlResult = buildUrl(tmpl, args, appendQuery);
+  const url = createUrlResult[0];
+  const queryOrBodyIndex = createUrlResult[1];
   const request = config.requestInterceptors
     .reduce<IPretendRequest>((data, interceptor) => interceptor(data), {
       url,
@@ -109,7 +113,10 @@ export class Pretend {
 
 }
 
-export function Get(url: string, appendQuery = false): MethodDecorator {
+export function Get(url: string, appendQuery?: boolean): MethodDecorator {
+  if (typeof appendQuery === 'undefined') {
+    appendQuery = false;
+  }
   return decoratorFactory('GET', url, false, appendQuery);
 }
 
