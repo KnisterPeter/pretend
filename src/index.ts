@@ -1,5 +1,5 @@
 import fetch from 'omni-fetch';
-import { RequestInit, Response } from 'isomorphic-fetch';
+import 'isomorphic-fetch';
 
 export type IPretendDecoder = (response: Response) => Promise<any>;
 export type IPretendRequest = { url: string, options: RequestInit };

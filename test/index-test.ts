@@ -1,6 +1,5 @@
 import { assert } from 'chai';
 import * as nock from 'nock';
-import { Response } from 'isomorphic-fetch';
 
 import { Pretend, Get, Post, Put, Delete } from '../src';
 
