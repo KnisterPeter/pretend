@@ -111,3 +111,23 @@ test('Pretend should use basic auth if configured', async t => {
 
   t.deepEqual(repsponse, {});
 });
+
+test('Pretend should return from the interceptor', async t => {
+  nock('http://host:port/')
+    .get('/path/id').reply(200, response)
+    .get('/path/id').reply(500, {});
+
+  let firstReponse: any = undefined;
+  const test = Pretend.builder()
+    .interceptor((chain, request) => {
+      if (!firstReponse) {
+        firstReponse = chain(request);
+      }
+      return firstReponse;
+    })
+    .target(Test, 'http://host:port/');
+  // First call gets through
+  await test.get('id');
+  // Second should be return from the interceptor (nock would fail)
+  t.deepEqual(await test.get('id'), response);
+});

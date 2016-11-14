@@ -5,10 +5,19 @@ export type IPretendDecoder = (response: Response) => Promise<any>;
 export type IPretendRequest = { url: string, options: RequestInit };
 export type IPretendRequestInterceptor = (request: IPretendRequest) => IPretendRequest;
 
-interface IPretendConfiguration {
-  baseUrl: string;
-  decoder: IPretendDecoder;
-  requestInterceptors: IPretendRequestInterceptor[];
+export interface Interceptor {
+  (chain: Chain, request: IPretendRequest): Promise<any>;
+}
+
+export interface Chain {
+  (request: IPretendRequest): Promise<any>;
+}
+
+interface Instance {
+  __Pretend__: {
+    baseUrl: string;
+    interceptors: Interceptor[];
+  };
 }
 
 function createUrl(url: string, args: any[]): [string, number] {
@@ -35,30 +44,36 @@ function buildUrl(tmpl: string, args: any[], appendQuery: boolean): [string, num
   return [`${url}${query}`, queryOrBodyIndex];
 }
 
-async function execute(config: IPretendConfiguration, method: string, tmpl: string, args: any[], sendBody: boolean,
+function chainFactory(interceptors: Interceptor[]): (request: IPretendRequest) => Promise<Response> {
+  let i = 0;
+  return function chainStep(request: IPretendRequest): Promise<Response> {
+    return interceptors[i++](chainStep, request);
+  };
+}
+
+function execute(instance: Instance, method: string, tmpl: string, args: any[], sendBody: boolean,
     appendQuery: boolean): Promise<any> {
   const createUrlResult = buildUrl(tmpl, args, appendQuery);
   const url = createUrlResult[0];
   const queryOrBodyIndex = createUrlResult[1];
-  const request = config.requestInterceptors
-    .reduce<IPretendRequest>((data, interceptor) => interceptor(data), {
-      url,
-      options: {
-        method,
-        headers: {},
-        body: sendBody ? JSON.stringify(args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex]) : undefined
-      }
-    });
-  const response = await fetch(request.url, request.options);
-  return config.decoder(response);
+  const body = sendBody ? JSON.stringify(args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex]) : undefined;
+
+  const chain = chainFactory(instance.__Pretend__.interceptors);
+  return chain({
+    url,
+    options: {
+      method,
+      headers: {},
+      body
+    }
+  });
 }
 
 function decoratorFactory(method: string, url: string, sendBody: boolean, appendQuery: boolean): MethodDecorator {
   return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
-    descriptor.value = async function(): Promise<any> {
-      const config = this.__Pretend__ as IPretendConfiguration;
-      return execute(config, method, `${config.baseUrl}${url}`, Array.prototype.slice.call(arguments), sendBody,
-        appendQuery);
+    descriptor.value = async function(this: Instance): Promise<any> {
+      return execute(this, method, `${this.__Pretend__.baseUrl}${url}`,
+        Array.prototype.slice.call(arguments), sendBody, appendQuery);
     };
     return descriptor;
   };
@@ -66,14 +81,28 @@ function decoratorFactory(method: string, url: string, sendBody: boolean, append
 
 export class Pretend {
 
-  private requestInterceptors: IPretendRequestInterceptor[] = [];
+  private interceptors: Interceptor[] = [];
   private decoder: IPretendDecoder = Pretend.JsonDecoder;
 
+  private static FetchInterceptor: Interceptor =
+    async (chain: Chain, request: IPretendRequest) => fetch(request.url, request.options);
   public static JsonDecoder: IPretendDecoder = (response: Response) => response.json();
   public static TextDecoder: IPretendDecoder = (response: Response) => response.text();
 
   public static builder(): Pretend {
     return new Pretend();
+  }
+
+  public interceptor(interceptor: Interceptor): this {
+    this.interceptors.push(interceptor);
+    return this;
+  }
+
+  public requestInterceptor(requestInterceptor: IPretendRequestInterceptor): this {
+    this.interceptors.push((chain: Chain, request: IPretendRequest) => {
+      return chain(requestInterceptor(request));
+    });
+    return this;
   }
 
   public basicAuthentication(username: string, password: string): this {
@@ -89,25 +118,27 @@ export class Pretend {
     return this;
   }
 
-  public requestInterceptor(requestInterceptor: IPretendRequestInterceptor): this {
-    this.requestInterceptors.push(requestInterceptor);
-    return this;
-  }
-
   public decode(decoder: IPretendDecoder): this {
     this.decoder = decoder;
     return this;
   }
 
   public target<T>(descriptor: {new(): T}, baseUrl: string): T {
-    const instance = new descriptor();
-    (instance as any).__Pretend__ = {
-      baseUrl: baseUrl.endsWith('/')
-        ? baseUrl.substring(0, baseUrl.length - 1)
-        : baseUrl,
-      decoder: this.decoder,
-      requestInterceptors: this.requestInterceptors
-    } as IPretendConfiguration;
+    if (this.decoder) {
+      // If we have a decoder, the first thing to do with a response is to decode it
+      this.interceptors.push(async (chain: Chain, request: IPretendRequest) => {
+        const response = await chain(request);
+        return this.decoder(response);
+      });
+    }
+    // This is the end of the request chain
+    this.interceptors.push(Pretend.FetchInterceptor);
+
+    const instance = new descriptor() as T & Instance;
+    instance.__Pretend__ = {
+      baseUrl: baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl,
+      interceptors: this.interceptors
+    };
     return instance;
   }
 

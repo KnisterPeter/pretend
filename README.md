@@ -9,13 +9,13 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
 
-A decorator based http webservice client build with typescript (inspired bei feign).
+A decorator based http webservice client build with typescript (inspired bei [feign](https://github.com/OpenFeign/feign)).
 
 ## Features
 
 * Handle REST based webservices
 * Configure a decoder (defaults to JSON)
-* Request interceptors
+* Generic request/response interceptor chain
 * Basic authentication
 * Request parameters (currently on GET requests)
 
@@ -60,6 +60,9 @@ call();
 
 ```
 
+Decoders, basicAuthentication and requestInterceptors are all special forms
+of the more generic interceptors which could be chained per request/response.
+
 ```js
   // Configure a text based decoder
   const client = Pretend
@@ -86,6 +89,47 @@ call();
                     return request;
                   })
                   .target(Test, 'http://host:port/');
+```
+
+#### interceptors
+
+Multiple interceptors could be added to each builder. The order of interceptor
+calls will result in a chain of calls like illistrated below:
+
+```js
+  // Configure a request interceptor
+  const client = Pretend
+                  .builder()
+                  .interceptor(async (chain, request) => {
+                    console.log('interceptor 1: request');
+                    const response = await chain(request);
+                    console.log('interceptor 1: response');
+                    return response;
+                  })
+                  .interceptor(async (chain, request) => {
+                    console.log('interceptor 2: request');
+                    const response = await chain(request);
+                    console.log('interceptor 2: response');
+                    return response;
+                  })
+                  .target(Test, 'http://host:port/');
+```
+
+```text
+             +---------------+    +---------------+
+Request ---> |               | -> |               |
+             | Interceptor 1 |    | Interceptor 2 | -> HTTP REST call
+Response <-- |               | <- |               |
+             +---------------+    +---------------+
+```
+
+This leads to the following console output:
+
+```text
+interceptor 1: request
+interceptor 2: request
+interceptor 2: response
+interceptor 1: response
 ```
 
 ## Future ideas / Roadmap
