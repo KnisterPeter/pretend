@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/node": "6.0.46",
     "ava": "0.16.0",
-    "coveralls": "2.11.14",
+    "coveralls": "2.11.15",
     "cz-conventional-changelog": "1.2.0",
     "in-publish": "2.0.0",
     "nock": "9.0.1",
