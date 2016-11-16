@@ -67,6 +67,26 @@ test('Pretend should call a get method and add a custom header', t => {
     });
 });
 
+test('Pretend should throw on wrong custom header format', t => {
+  /* tslint:disable */
+  class Api {
+    @Headers('syntactically-wrong')
+    @Get('/path')
+    get(): Promise<string> { return undefined as any; };
+  }
+  /* tslint:enable */
+  const test = Pretend.builder()
+    .target(Api, 'http://host:port/');
+
+  return test.get()
+    .then(() => {
+      t.fail('should throw');
+    })
+    .catch(() => {
+      // Ignore here
+    });
+});
+
 test('Pretend should call a post method', t => {
   const test = setup();
   nock('http://host:port/').post('/path', {mockResponse}).reply(200, mockResponse);

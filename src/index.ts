@@ -104,27 +104,34 @@ export function methodDecoratorFactory(method: string, url: string, sendBody: bo
  */
 export function headerDecoratorFactory(headers: string|string[]): MethodDecorator {
   return (_target: Object, _propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
-    const originalFunction = descriptor.value;
+    const originalFunction: (...args: any[]) => Promise<any> = descriptor.value;
     descriptor.value = function(this: Instance, ...args: any[]): Promise<any> {
-      this.__Pretend__.perRequest = {
-        headers: (Array.isArray(headers) ? headers : [headers]).reduce((akku, header) => {
-          const match = header.match(/([^:]+): *(.*)/);
-          if (!match) {
-            throw new Error(`Invalid header format for '${header}'`);
-          }
-          const [, name, value] = match;
-          if (!akku[name]) {
-            akku[name] = [];
-          }
-          akku[name].push(value);
-          return akku;
-        }, {} as {[name: string]: string[]})
-      };
-      try {
-        return originalFunction.apply(this, args);
-      } finally {
-        this.__Pretend__.perRequest = undefined;
-      }
+      return Promise.resolve()
+        .then(() => {
+          this.__Pretend__.perRequest = {
+            headers: (Array.isArray(headers) ? headers : [headers]).reduce((akku, header) => {
+              const match = header.match(/([^:]+): *(.*)/);
+              if (!match) {
+                throw new Error(`Invalid header format for '${header}'`);
+              }
+              const [, name, value] = match;
+              if (!akku[name]) {
+                akku[name] = [];
+              }
+              akku[name].push(value);
+              return akku;
+            }, {} as {[name: string]: string[]})
+          };
+          return (originalFunction.apply(this, args) as Promise<any>)
+            .then(result => {
+              this.__Pretend__.perRequest = undefined;
+              return result;
+            })
+            .catch(error => {
+              this.__Pretend__.perRequest = undefined;
+              throw error;
+            });
+        });
     };
     return descriptor;
   };
