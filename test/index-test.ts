@@ -195,3 +195,12 @@ test('Pretend should return from the interceptor', t => {
       t.deepEqual(response, mockResponse);
     });
 });
+
+test('Pretend should reset per-request data after each request', t => {
+  const test = setup();
+  nock('http://host:port/').get('/with/header').reply(200, mockResponse);
+  return test.getWithHeader()
+    .then(() => {
+      t.is((test as any).__Pretend__.perRequest, undefined);
+    });
+});
