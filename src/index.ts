@@ -51,13 +51,15 @@ function buildUrl(tmpl: string, args: any[], appendQuery: boolean): [string, num
 
 function prepareHeaders(instance: Instance): Headers {
   const headers = new Headers();
-  const {perRequest} = instance.__Pretend__;
-  if (perRequest && perRequest.headers) {
-    Object.keys(perRequest.headers).forEach(name => {
-      perRequest.headers[name].forEach(value => {
-        headers.append(name, value);
+  if (instance.__Pretend__.perRequest) {
+    const perRequest = instance.__Pretend__.perRequest;
+    if (perRequest && perRequest.headers) {
+      Object.keys(perRequest.headers).forEach(name => {
+        perRequest.headers[name].forEach(value => {
+          headers.append(name, value);
+        });
       });
-    });
+    }
   }
   return headers;
 }
@@ -108,13 +110,15 @@ export function methodDecoratorFactory(method: string, url: string, sendBody: bo
 export function headerDecoratorFactory(headers: string|string[]): MethodDecorator {
   return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
     const originalFunction = descriptor.value;
-    descriptor.value = async function(this: Instance, ...args: any[]): Promise<any> {
+    descriptor.value = async function(this: Instance): Promise<any> {
       if (!Array.isArray(headers)) {
         headers = [headers];
       }
       this.__Pretend__.perRequest = {
         headers: headers.reduce((akku, header) => {
-          const [, name, value] = header.match(/([^:]+): *(.*)/);
+          const match = header.match(/([^:]+): *(.*)/);
+          const name = match[1];
+          const value = match[2];
           if (!akku[name]) {
             akku[name] = [];
           }
@@ -123,7 +127,7 @@ export function headerDecoratorFactory(headers: string|string[]): MethodDecorato
         }, {} as {[name: string]: string[]})
       };
       try {
-        return originalFunction.apply(this, args);
+        return originalFunction.apply(this, Array.prototype.slice.call(arguments));
       } finally {
         this.__Pretend__.perRequest = undefined;
       }
