@@ -1,6 +1,8 @@
 import fetch from 'omni-fetch';
 import 'isomorphic-fetch';
 
+export {Get, Post, Put, Delete, Headers} from './decorators';
+
 export type IPretendDecoder = (response: Response) => Promise<any>;
 export type IPretendRequest = { url: string, options: RequestInit };
 export type IPretendRequestInterceptor = (request: IPretendRequest) => IPretendRequest;
@@ -17,6 +19,9 @@ interface Instance {
   __Pretend__: {
     baseUrl: string;
     interceptors: Interceptor[];
+    perRequest?: {
+      headers?: {[name: string]: string[]};
+    };
   };
 }
 
@@ -44,6 +49,19 @@ function buildUrl(tmpl: string, args: any[], appendQuery: boolean): [string, num
   return [`${url}${query}`, queryOrBodyIndex];
 }
 
+function prepareHeaders(instance: Instance): Headers {
+  const headers = new Headers();
+  const {perRequest} = instance.__Pretend__;
+  if (perRequest && perRequest.headers) {
+    Object.keys(perRequest.headers).forEach(name => {
+      perRequest.headers[name].forEach(value => {
+        headers.append(name, value);
+      });
+    });
+  }
+  return headers;
+}
+
 function chainFactory(interceptors: Interceptor[]): (request: IPretendRequest) => Promise<Response> {
   let i = 0;
   return function chainStep(request: IPretendRequest): Promise<Response> {
@@ -56,6 +74,7 @@ function execute(instance: Instance, method: string, tmpl: string, args: any[], 
   const createUrlResult = buildUrl(tmpl, args, appendQuery);
   const url = createUrlResult[0];
   const queryOrBodyIndex = createUrlResult[1];
+  const headers = prepareHeaders(instance);
   const body = sendBody ? JSON.stringify(args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex]) : undefined;
 
   const chain = chainFactory(instance.__Pretend__.interceptors);
@@ -63,17 +82,51 @@ function execute(instance: Instance, method: string, tmpl: string, args: any[], 
     url,
     options: {
       method,
-      headers: {},
+      headers,
       body
     }
   });
 }
 
-function decoratorFactory(method: string, url: string, sendBody: boolean, appendQuery: boolean): MethodDecorator {
+/**
+ * @internal
+ */
+export function methodDecoratorFactory(method: string, url: string, sendBody: boolean,
+    appendQuery: boolean): MethodDecorator {
   return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
     descriptor.value = async function(this: Instance): Promise<any> {
       return execute(this, method, `${this.__Pretend__.baseUrl}${url}`,
         Array.prototype.slice.call(arguments), sendBody, appendQuery);
+    };
+    return descriptor;
+  };
+}
+
+/**
+ * @internal
+ */
+export function headerDecoratorFactory(headers: string|string[]): MethodDecorator {
+  return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
+    const originalFunction = descriptor.value;
+    descriptor.value = async function(this: Instance, ...args: any[]): Promise<any> {
+      if (!Array.isArray(headers)) {
+        headers = [headers];
+      }
+      this.__Pretend__.perRequest = {
+        headers: headers.reduce((akku, header) => {
+          const [, name, value] = header.match(/([^:]+): *(.*)/);
+          if (!akku[name]) {
+            akku[name] = [];
+          }
+          akku[name].push(value);
+          return akku;
+        }, {} as {[name: string]: string[]})
+      };
+      try {
+        return originalFunction.apply(this, args);
+      } finally {
+        this.__Pretend__.perRequest = undefined;
+      }
     };
     return descriptor;
   };
@@ -112,7 +165,7 @@ export class Pretend {
         ? btoa(usernameAndPassword)
         : new Buffer(usernameAndPassword, 'binary').toString('base64'));
     this.requestInterceptor((request) => {
-      (request.options.headers as any)['Authorization'] = auth;
+      (request.options.headers as Headers).set('Authorization', auth);
       return request;
     });
     return this;
@@ -142,23 +195,4 @@ export class Pretend {
     return instance;
   }
 
-}
-
-export function Get(url: string, appendQuery?: boolean): MethodDecorator {
-  if (typeof appendQuery === 'undefined') {
-    appendQuery = false;
-  }
-  return decoratorFactory('GET', url, false, appendQuery);
-}
-
-export function Post(url: string): MethodDecorator {
-  return decoratorFactory('POST', url, true, false);
-}
-
-export function Put(url: string): MethodDecorator {
-  return decoratorFactory('PUT', url, true, false);
-}
-
-export function Delete(url: string): MethodDecorator {
-  return decoratorFactory('DELETE', url, false, false);
 }

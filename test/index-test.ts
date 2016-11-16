@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as nock from 'nock';
 
-import { Pretend, Get, Post, Put, Delete } from '../src';
+import { Pretend, Get, Post, Put, Delete, Headers } from '../src';
 
 /* tslint:disable */
 class Test {
@@ -9,6 +9,9 @@ class Test {
   public async get(id: string): Promise<any> {}
   @Get('/path/{id}', true)
   public async getWithQuery(id: string, parameters: any): Promise<any> {}
+  @Headers('Accept: accept')
+  @Get('/with/header')
+  public async getWithHeader(): Promise<any> {}
   @Post('/path')
   public async post(body: any): Promise<any> {}
   @Put('/path')
@@ -36,6 +39,16 @@ test('Pretend should call a get method with query parameters', async t => {
   const test = setup();
   nock('http://host:port/').get('/path/id?a=b&c=d').reply(200, response);
   t.deepEqual(await test.getWithQuery('id', {a: 'b', c: 'd'}), response);
+});
+
+test('Pretend should call a get method and add a custom header', async t => {
+  const test = setup();
+  nock('http://host:port/', {
+      reqheaders: {
+        'accept': 'accept'
+      }
+    }).get('/with/header').reply(200, response);
+  t.deepEqual(await test.getWithHeader(), response);
 });
 
 test('Pretend should call a post method', async t => {

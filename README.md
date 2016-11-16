@@ -18,6 +18,7 @@ A decorator based http webservice client build with typescript (inspired bei [fe
 * Generic request/response interceptor chain
 * Basic authentication
 * Request parameters (currently on GET requests)
+* Custom headers per method
 
 ## Usage
 
@@ -34,6 +35,7 @@ npm install pretend --save
 ```js
 class Test {
 
+  @Headers('Accept: application/json')
   @Get('/path/{id}', true)
   public async get(id: string, parameters: any) {}
 

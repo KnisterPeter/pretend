@@ -4,6 +4,7 @@ declare module 'nock' {
     post(path: string, body?: any): this;
     put(path: string): this;
     delete(path: string): this;
+    matchHeader(name: string, value: string): this;
     reply(status: number, data?: any): any;
     replyWithError(data: any): any;
   }
