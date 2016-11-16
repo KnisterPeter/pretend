@@ -204,3 +204,12 @@ test('Pretend should reset per-request data after each request', t => {
       t.is((test as any).__Pretend__.perRequest, undefined);
     });
 });
+
+test('Pretend should reset per-request data after error requests', t => {
+  const test = setup();
+  nock('http://host:port/').get('/with/header').replyWithError('failed');
+  return test.getWithHeader()
+    .catch(() => {
+      t.is((test as any).__Pretend__.perRequest, undefined);
+    });
+});
