@@ -3,88 +3,114 @@ import * as nock from 'nock';
 
 import { Pretend, Get, Post, Put, Delete, Headers } from '../src';
 
-/* tslint:disable */
-class Test {
+interface Test {
+  get(_id: string): Promise<any>;
+  getWithQuery(_id: string, _parameters: any): Promise<any>;
+  getWithHeader(): Promise<any>;
+  post(_body: any): Promise<any>;
+  put(): Promise<any>;
+  delete(_id: string): Promise<any>;
+}
+
+class TestImpl implements Test {
   @Get('/path/{id}')
-  public async get(id: string): Promise<any> {}
+  public get(_id: string): any { /* */ }
   @Get('/path/{id}', true)
-  public async getWithQuery(id: string, parameters: any): Promise<any> {}
+  public getWithQuery(_id: string, _parameters: any): any { /* */ }
   @Headers('Accept: accept')
   @Get('/with/header')
-  public async getWithHeader(): Promise<any> {}
+  public getWithHeader(): any { /* */ }
   @Post('/path')
-  public async post(body: any): Promise<any> {}
+  public post(_body: any): any { /* */ }
   @Put('/path')
-  public async put(): Promise<any> {}
+  public put(): any { /* */ }
   @Delete('/path/:id')
-  public async delete(id: string): Promise<any> {}
+  public delete(_id: string): any { /* */ }
 }
-/* tslint:enable */
 
-const response = {
+const mockResponse = {
   key: 'value'
 };
 
 function setup(): Test {
-  return Pretend.builder().target(Test, 'http://host:port/');
+  return Pretend.builder().target(TestImpl, 'http://host:port/');
 }
 
-test('Pretend should call a get method', async t => {
+test('Pretend should call a get method', t => {
   const test = setup();
-  nock('http://host:port/').get('/path/id').reply(200, response);
-  t.deepEqual(await test.get('id'), response);
+  nock('http://host:port/').get('/path/id').reply(200, mockResponse);
+  return test.get('id')
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
 });
 
-test('Pretend should call a get method with query parameters', async t => {
+test('Pretend should call a get method with query parameters', t => {
   const test = setup();
-  nock('http://host:port/').get('/path/id?a=b&c=d').reply(200, response);
-  t.deepEqual(await test.getWithQuery('id', {a: 'b', c: 'd'}), response);
+  nock('http://host:port/').get('/path/id?a=b&c=d').reply(200, mockResponse);
+  return test.getWithQuery('id', {a: 'b', c: 'd'})
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
 });
 
-test('Pretend should call a get method and add a custom header', async t => {
+test('Pretend should call a get method and add a custom header', t => {
   const test = setup();
   nock('http://host:port/', {
       reqheaders: {
         'accept': 'accept'
       }
-    }).get('/with/header').reply(200, response);
-  t.deepEqual(await test.getWithHeader(), response);
+    }).get('/with/header').reply(200, mockResponse);
+  return test.getWithHeader()
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
 });
 
-test('Pretend should call a post method', async t => {
+test('Pretend should call a post method', t => {
   const test = setup();
-  nock('http://host:port/').post('/path', {response}).reply(200, response);
-  t.deepEqual(await test.post({response}), response);
+  nock('http://host:port/').post('/path', {mockResponse}).reply(200, mockResponse);
+  return test.post({mockResponse})
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
 });
 
-test('Pretend should call a put method', async t => {
-  const test = Pretend.builder().target(Test, 'http://host:port');
-  nock('http://host:port/').put('/path').reply(200, response);
-  t.deepEqual(await test.put(), response);
+test('Pretend should call a put method', t => {
+  const test: Test = Pretend.builder().target(TestImpl, 'http://host:port');
+  nock('http://host:port/').put('/path').reply(200, mockResponse);
+  return test.put()
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
 });
 
-test('Pretend should call a delete method', async t => {
+test('Pretend should call a delete method', t => {
   const test = setup();
-  nock('http://host:port/').delete('/path/id').reply(200, response);
-  t.deepEqual(await test.delete('id'), response);
+  nock('http://host:port/').delete('/path/id').reply(200, mockResponse);
+  return test.delete('id')
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
 });
 
-test('Pretend should throw on error', async t => {
+test('Pretend should throw on error', t => {
   const test = setup();
   nock('http://host:port/').delete('/path/id').replyWithError('server-fail');
-  try {
-    await test.delete('id');
-    t.fail('should throw');
-  } catch (e) {
-    // Ignore here
-  }
+  return test.delete('id')
+    .then(() => {
+      t.fail('should throw');
+    })
+    .catch(() => {
+      // Ignore here
+    });
 });
 
-test('Pretend should return content based on decoder configuration', async t => {
+test('Pretend should return content based on decoder configuration', t => {
   /* tslint:disable */
   class Api {
     @Get('/path')
-    async get(): Promise<string> { return undefined };
+    get(): Promise<string> { return undefined as any; };
   }
   /* tslint:enable */
   nock('http://host:port/').get('/path').reply(200, 'some-string');
@@ -96,17 +122,18 @@ test('Pretend should return content based on decoder configuration', async t => 
     })
     .target(Api, 'http://host:port/');
 
-  const text = await api.get();
-
-  t.true(decoderCalled, 'The decoder should be called');
-  t.is(text, 'some-string');
+  return api.get()
+    .then(text => {
+      t.true(decoderCalled, 'The decoder should be called');
+      t.is(text, 'some-string');
+    });
 });
 
-test('Pretend should use basic auth if configured', async t => {
+test('Pretend should use basic auth if configured', t => {
   /* tslint:disable */
   class Api {
     @Get('/')
-    async get(): Promise<any> {};
+    get(): Promise<any> { return undefined as any; };
   }
   /* tslint:enable */
   nock('http://host:port/', {
@@ -120,27 +147,31 @@ test('Pretend should use basic auth if configured', async t => {
   const api = Pretend.builder()
     .basicAuthentication('Aladdin', 'OpenSesame')
     .target(Api, 'http://host:port');
-  const repsponse = await api.get();
-
-  t.deepEqual(repsponse, {});
+  return api.get()
+    .then(response => {
+      t.deepEqual(response, {});
+    });
 });
 
-test('Pretend should return from the interceptor', async t => {
+test('Pretend should return from the interceptor', t => {
   nock('http://host:port/')
-    .get('/path/id').reply(200, response)
+    .get('/path/id').reply(200, mockResponse)
     .get('/path/id').reply(500, {});
 
   let firstReponse: any = undefined;
-  const test = Pretend.builder()
+  const test: Test = Pretend.builder()
     .interceptor((chain, request) => {
       if (!firstReponse) {
         firstReponse = chain(request);
       }
       return firstReponse;
     })
-    .target(Test, 'http://host:port/');
+    .target(TestImpl, 'http://host:port/');
   // First call gets through
-  await test.get('id');
-  // Second should be return from the interceptor (nock would fail)
-  t.deepEqual(await test.get('id'), response);
+  return test.get('id')
+    .then(() => test.get('id'))
+    .then(response => {
+      // Second should be return from the interceptor (nock would fail)
+      t.deepEqual(response, mockResponse);
+    });
 });
