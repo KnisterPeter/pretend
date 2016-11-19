@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as nock from 'nock';
 
-import { Pretend, Get, Post, Put, Delete, Headers } from '../src';
+import { Delete, Get, Headers, Post, Pretend, Put } from '../src';
 
 interface Test {
   get(_id: string): Promise<any>;
@@ -58,7 +58,7 @@ test('Pretend should call a get method and add a custom header', t => {
   const test = setup();
   nock('http://host:port/', {
       reqheaders: {
-        'accept': 'accept'
+        accept: 'accept'
       }
     }).get('/with/header').reply(200, mockResponse);
   return test.getWithHeader()
@@ -83,7 +83,7 @@ test('Pretend should throw on wrong custom header format', t => {
       t.fail('should throw');
     })
     .catch(() => {
-      // Ignore here
+      // ignore here
     });
 });
 
@@ -122,7 +122,7 @@ test('Pretend should throw on error', t => {
       t.fail('should throw');
     })
     .catch(() => {
-      // Ignore here
+      // ignore here
     });
 });
 
@@ -187,11 +187,11 @@ test('Pretend should return from the interceptor', t => {
       return firstReponse;
     })
     .target(TestImpl, 'http://host:port/');
-  // First call gets through
+  // first call gets through
   return test.get('id')
     .then(() => test.get('id'))
     .then(response => {
-      // Second should be return from the interceptor (nock would fail)
+      // second should be return from the interceptor (nock would fail)
       t.deepEqual(response, mockResponse);
     });
 });

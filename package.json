@@ -10,7 +10,7 @@
     "typings/isomorphic-fetch.d.ts"
   ],
   "scripts": {
-    "linter": "tslint '{src,test}/**/*.ts'",
+    "linter": "tslint --project ./tsconfig.json --type-check",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "build": "tsc --sourceMap",

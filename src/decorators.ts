@@ -1,4 +1,4 @@
-import {methodDecoratorFactory, headerDecoratorFactory} from './index';
+import {headerDecoratorFactory, methodDecoratorFactory} from './index';
 
 export function Get(url: string, appendQuery?: boolean): MethodDecorator {
   if (typeof appendQuery === 'undefined') {

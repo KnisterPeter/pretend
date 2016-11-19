@@ -1,5 +1,5 @@
-import fetch from 'omni-fetch';
 import 'isomorphic-fetch';
+import fetch from 'omni-fetch';
 
 export {Get, Post, Put, Delete, Headers} from './decorators';
 
@@ -139,13 +139,13 @@ export function headerDecoratorFactory(headers: string|string[]): MethodDecorato
 
 export class Pretend {
 
-  private interceptors: Interceptor[] = [];
-  private decoder: IPretendDecoder = Pretend.JsonDecoder;
-
   private static FetchInterceptor: Interceptor =
     (_chain: Chain, request: IPretendRequest) => fetch(request.url, request.options);
   public static JsonDecoder: IPretendDecoder = (response: Response) => response.json();
   public static TextDecoder: IPretendDecoder = (response: Response) => response.text();
+
+  private interceptors: Interceptor[] = [];
+  private decoder: IPretendDecoder = Pretend.JsonDecoder;
 
   public static builder(): Pretend {
     return new Pretend();
@@ -183,12 +183,12 @@ export class Pretend {
 
   public target<T>(descriptor: {new(): T}, baseUrl: string): T {
     if (this.decoder) {
-      // If we have a decoder, the first thing to do with a response is to decode it
+      // if we have a decoder, the first thing to do with a response is to decode it
       this.interceptors.push((chain: Chain, request: IPretendRequest) => {
         return chain(request).then(response => this.decoder(response));
       });
     }
-    // This is the end of the request chain
+    // this is the end of the request chain
     this.interceptors.push(Pretend.FetchInterceptor);
 
     const instance = new descriptor() as T & Instance;
