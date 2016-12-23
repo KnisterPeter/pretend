@@ -49,7 +49,7 @@
   "dependencies": {
     "@types/isomorphic-fetch": "0.0.31",
     "isomorphic-fetch": "2.2.1",
-    "omni-fetch": "0.2.1"
+    "omni-fetch": "0.2.2"
   },
   "config": {
     "commitizen": {
