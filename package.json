@@ -32,24 +32,23 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@knisterpeter/standard-tslint": "1.0.3",
-    "@types/node": "7.0.0",
-    "ava": "0.17.0",
-    "coveralls": "2.11.15",
-    "cz-conventional-changelog": "1.2.0",
-    "in-publish": "2.0.0",
-    "nock": "9.0.2",
-    "nyc": "10.1.2",
-    "rimraf": "2.5.4",
-    "source-map-support": "0.4.10",
-    "standard-version": "4.0.0",
-    "tslint": "4.3.1",
-    "typescript": "2.1.5"
+    "@knisterpeter/standard-tslint": "^1.0.3",
+    "@types/node": "^7.0.0",
+    "ava": "~0.17.0",
+    "coveralls": "^2.11.15",
+    "cz-conventional-changelog": "^1.2.0",
+    "nock": "^9.0.2",
+    "nyc": "^10.1.2",
+    "rimraf": "^2.5.4",
+    "source-map-support": "~0.4.10",
+    "standard-version": "^4.0.0",
+    "tslint": "^4.3.1",
+    "typescript": "^2.1.5"
   },
   "dependencies": {
-    "@types/isomorphic-fetch": "0.0.32",
-    "isomorphic-fetch": "2.2.1",
-    "omni-fetch": "0.2.2"
+    "@types/isomorphic-fetch": "^0.0.31",
+    "isomorphic-fetch": "^2.2.1",
+    "omni-fetch": "^0.2.2"
   },
   "config": {
     "commitizen": {
