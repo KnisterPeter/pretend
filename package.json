@@ -34,7 +34,7 @@
   "devDependencies": {
     "@knisterpeter/standard-tslint": "^1.0.3",
     "@types/node": "^7.0.0",
-    "ava": "~0.17.0",
+    "ava": "~0.18.0",
     "coveralls": "^2.11.15",
     "cz-conventional-changelog": "^1.2.0",
     "nock": "^9.0.2",
