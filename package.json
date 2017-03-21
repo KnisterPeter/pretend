@@ -6,8 +6,7 @@
   "files": [
     "dist",
     "index.d.ts",
-    "src",
-    "typings/isomorphic-fetch.d.ts"
+    "src"
   ],
   "scripts": {
     "linter": "tslint --project ./tsconfig.json --type-check",
@@ -46,7 +45,6 @@
     "typescript": "^2.1.5"
   },
   "dependencies": {
-    "@types/isomorphic-fetch": "^0.0.31",
     "isomorphic-fetch": "^2.2.1",
     "omni-fetch": "^0.2.2"
   },
