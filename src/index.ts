@@ -1,5 +1,4 @@
 import 'isomorphic-fetch';
-import fetch from 'omni-fetch';
 
 export {Get, Post, Put, Delete, Headers} from './decorators';
 
