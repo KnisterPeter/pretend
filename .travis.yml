@@ -1,6 +1,7 @@
 sudo: false
 language: node_js
 node_js:
+- 'stable'
 - '6'
 - '4'
 matrix:
@@ -18,4 +19,4 @@ notifications:
 
 before_script: 'npm run linter'
 script: 'npm run test'
-after_script: 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
+after_script: 'npm run coverage'

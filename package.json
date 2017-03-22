@@ -14,10 +14,11 @@
     "prebuild": "npm run clean",
     "build": "tsc --sourceMap",
     "pretest": "npm run clean && tsc --inlineSourceMap",
-    "test": "nyc --reporter lcov ./node_modules/.bin/ava",
+    "test": "nyc ava",
+    "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "watch:build": "tsc --watch --sourceMap",
     "watch:test": "npm test -- --watch",
-    "prerelease": "npm test && npm run build",
+    "prerelease": "git checkout master && git pull origin master && npm test && npm run build",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish"
   },
