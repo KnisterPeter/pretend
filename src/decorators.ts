@@ -15,8 +15,8 @@ export function Put(url: string): MethodDecorator {
   return methodDecoratorFactory('PUT', url, true, false);
 }
 
-export function Delete(url: string): MethodDecorator {
-  return methodDecoratorFactory('DELETE', url, false, false);
+export function Delete(url: string, sendBody = false): MethodDecorator {
+  return methodDecoratorFactory('DELETE', url, sendBody, false);
 }
 
 export function Headers(headers: string|string[]): MethodDecorator {

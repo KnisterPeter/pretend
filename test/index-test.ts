@@ -10,6 +10,7 @@ interface Test {
   post(_body: any): Promise<any>;
   put(): Promise<any>;
   delete(_id: string): Promise<any>;
+  deleteBody(_id: string, _body: object): Promise<any>;
 }
 
 class TestImpl implements Test {
@@ -26,6 +27,8 @@ class TestImpl implements Test {
   public put(): any { /* */ }
   @Delete('/path/:id')
   public delete(_id: string): any { /* */ }
+  @Delete('/path/:id', true)
+  public deleteBody(_id: string, _body: object): any { /* */ }
 }
 
 const mockResponse = {
@@ -123,6 +126,15 @@ test('Pretend should throw on error', t => {
     })
     .catch(() => {
       // ignore here
+    });
+});
+
+test('Pretend should call a delete method and send a body', t => {
+  const test = setup();
+  nock('http://host:port/').delete('/path/id', {data: 'data'}).reply(200, mockResponse);
+  return test.deleteBody('id', {data: 'data'})
+    .then(response => {
+      t.deepEqual(response, mockResponse);
     });
 });
 

@@ -3,7 +3,7 @@ declare module 'nock' {
     get(path: string): this;
     post(path: string, body?: any): this;
     put(path: string): this;
-    delete(path: string): this;
+    delete(path: string, body?: any): this;
     matchHeader(name: string, value: string): this;
     reply(status: number, data?: any): any;
     replyWithError(data: any): any;
