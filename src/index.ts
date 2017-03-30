@@ -139,6 +139,7 @@ export function headerDecoratorFactory(headers: string|string[]): MethodDecorato
 export class Pretend {
 
   private static FetchInterceptor: Interceptor =
+    // tslint:disable-next-line
     (_chain: Chain, request: IPretendRequest) => fetch(request.url, request.options);
   public static JsonDecoder: IPretendDecoder = (response: Response) => response.json();
   public static TextDecoder: IPretendDecoder = (response: Response) => response.text();
