@@ -86,7 +86,7 @@ test('Pretend should throw on wrong custom header format', t => {
       t.fail('should throw');
     })
     .catch(() => {
-      // ignore here
+      t.pass();
     });
 });
 
@@ -125,7 +125,7 @@ test('Pretend should throw on error', t => {
       t.fail('should throw');
     })
     .catch(() => {
-      // ignore here
+      t.pass();
     });
 });
 
