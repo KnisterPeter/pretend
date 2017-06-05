@@ -119,7 +119,7 @@ export function headerDecoratorFactory(headers: string|string[]): MethodDecorato
               }
               akku[name].push(value);
               return akku;
-            }, {} as {[name: string]: string[]})
+            }, {})
           };
           return (originalFunction.apply(this, args) as Promise<any>)
             .then(result => {
