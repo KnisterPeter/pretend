@@ -1,5 +1,7 @@
 # pretend
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/KnisterPeter/pretend.svg)](https://greenkeeper.io/)
+
 [![GitHub license](https://img.shields.io/github/license/KnisterPeter/pretend.svg)](https://github.com/KnisterPeter/pretend)
 [![Travis](https://img.shields.io/travis/KnisterPeter/pretend.svg)](https://travis-ci.org/KnisterPeter/pretend)
 [![Coveralls branch](https://img.shields.io/coveralls/KnisterPeter/pretend/master.svg)](https://coveralls.io/github/KnisterPeter/pretend)
