@@ -1,15 +1,12 @@
 # pretend
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/KnisterPeter/pretend.svg)](https://greenkeeper.io/)
-
 [![GitHub license](https://img.shields.io/github/license/KnisterPeter/pretend.svg)](https://github.com/KnisterPeter/pretend)
 [![Travis](https://img.shields.io/travis/KnisterPeter/pretend.svg)](https://travis-ci.org/KnisterPeter/pretend)
 [![Coveralls branch](https://img.shields.io/coveralls/KnisterPeter/pretend/master.svg)](https://coveralls.io/github/KnisterPeter/pretend)
-[![David](https://img.shields.io/david/KnisterPeter/pretend.svg)](https://david-dm.org/KnisterPeter/pretend)
-[![David](https://img.shields.io/david/dev/KnisterPeter/pretend.svg)](https://david-dm.org/KnisterPeter/pretend#info=devDependencies&view=table)
 [![npm](https://img.shields.io/npm/v/pretend.svg)](https://www.npmjs.com/package/pretend)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
+[![Greenkeeper badge](https://badges.greenkeeper.io/KnisterPeter/pretend.svg)](https://greenkeeper.io/)
 
 A decorator based http webservice client build with typescript (inspired bei [feign](https://github.com/OpenFeign/feign)).
 
