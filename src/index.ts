@@ -47,6 +47,17 @@ function createQuery(parameters: object): string {
     .replace(/^&/, '?');
 }
 
+function filterFormData(args: any[], parameters?: FormDataParameter[]): any[] {
+  const urlParams: any[] = [];
+  args.reduce((memo: any[], arg, index) => {
+    if (!parameters || parameters.every(param => param.parameter !== index)) {
+      memo.push(arg);
+    }
+    return memo;
+  }, urlParams);
+  return urlParams;
+}
+
 function buildUrl(tmpl: string, args: any[], appendQuery: boolean): [string, number] {
   const [url, queryOrBodyIndex] = createUrl(tmpl, args);
   const query = createQuery(appendQuery && queryOrBodyIndex > -1 ? args[queryOrBodyIndex] : {});
@@ -86,8 +97,8 @@ function execute(instance: Instance, method: string, tmpl: string, args: any[], 
     }
     return sendBody ? JSON.stringify(args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex]) : undefined;
   };
-
-  const createUrlResult = buildUrl(tmpl, args, appendQuery && !parameters);
+  const urlParams = filterFormData(args, parameters);
+  const createUrlResult = buildUrl(tmpl, urlParams, appendQuery);
   const url = createUrlResult[0];
   const queryOrBodyIndex = createUrlResult[1];
   const headers = prepareHeaders(instance);
