@@ -13,6 +13,7 @@ interface Test {
   post(_body: any): Promise<any>;
   postWithQueryAndBody(_query: any, _body: any): Promise<any>;
   postWithFormData(_formData: any): Promise<any>;
+  postWithFormDataAndQuery(_query: any, _formData: any): Promise<any>;
   put(): Promise<any>;
   putWithQuery(_parameters: any): Promise<any>;
   delete(_id: string): Promise<any>;
@@ -37,6 +38,8 @@ class TestImpl implements Test {
   public postWithQueryAndBody(): any { /* */ }
   @Post('/path/withFormData', true)
   public postWithFormData(@FormData('name') _formData: any): any { /* */ }
+  @Post('/path/withFormData', true)
+  public postWithFormDataAndQuery(_query: any, @FormData('name') _formData: any): any { /* */ }
   @Put('/path')
   public put(): any { /* */ }
   @Put('/path', true)
@@ -147,6 +150,21 @@ test('Pretend should call a post method with FormData', t => {
     .post('/path/withFormData', /Content-Disposition: form-data; name="name"/)
     .reply(200, mockResponse);
   return test.postWithFormData(new Buffer(10).toString('UTF-8'))
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
+});
+
+test('Pretend should call a post method with FormData and query', t => {
+  const test = setup();
+  nock('http://host:port/', {
+      reqheaders: {
+        'Content-Type': /^multipart\/form-data/
+      }
+    })
+    .post('/path/withFormData?query=params', /Content-Disposition: form-data; name="name"/)
+    .reply(200, mockResponse);
+  return test.postWithFormDataAndQuery({query: 'params'}, new Buffer(10).toString('UTF-8') )
     .then(response => {
       t.deepEqual(response, mockResponse);
     });
