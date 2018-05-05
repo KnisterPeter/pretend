@@ -2,11 +2,11 @@
 
 [![GitHub license](https://img.shields.io/github/license/KnisterPeter/pretend.svg)](https://github.com/KnisterPeter/pretend)
 [![Travis](https://img.shields.io/travis/KnisterPeter/pretend.svg)](https://travis-ci.org/KnisterPeter/pretend)
-[![Coveralls branch](https://img.shields.io/coveralls/KnisterPeter/pretend/master.svg)](https://coveralls.io/github/KnisterPeter/pretend)
+[![Coverage Status](https://coveralls.io/repos/github/KnisterPeter/pretend/badge.svg?branch=master)](https://coveralls.io/github/KnisterPeter/pretend?branch=master)
 [![npm](https://img.shields.io/npm/v/pretend.svg)](https://www.npmjs.com/package/pretend)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
-[![Greenkeeper badge](https://badges.greenkeeper.io/KnisterPeter/pretend.svg)](https://greenkeeper.io/)
+[![renovate badge](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovateapp.com/)
 
 A decorator based http webservice client build with typescript (inspired bei [feign](https://github.com/OpenFeign/feign)).
 
