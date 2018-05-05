@@ -48,14 +48,9 @@ function createQuery(parameters: object): string {
 }
 
 function filterFormData(args: any[], parameters?: FormDataParameter[]): any[] {
-  const urlParams: any[] = [];
-  args.reduce((memo: any[], arg, index) => {
-    if (!parameters || parameters.every(param => param.parameter !== index)) {
-      memo.push(arg);
-    }
-    return memo;
-  }, urlParams);
-  return urlParams;
+  return args.filter((_, index) => {
+    return !parameters || parameters.every(param => param.parameter !== index)
+  });
 }
 
 function buildUrl(tmpl: string, args: any[], appendQuery: boolean): [string, number] {
