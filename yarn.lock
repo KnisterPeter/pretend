@@ -57,9 +57,9 @@
     pretty-ms "^0.2.1"
     text-table "^0.2.0"
 
-"@types/node@10.0.3":
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.0.3.tgz#1f89840c7aac2406cc43a2ecad98fc02a8e130e4"
+"@types/node@10.0.4":
+  version "10.0.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.0.4.tgz#130598ee56e9a1210a53f557d64935571f05390d"
 
 JSONStream@^1.0.4:
   version "1.3.2"
