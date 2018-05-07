@@ -35,7 +35,7 @@
     "@knisterpeter/standard-tslint": "1.4.0",
     "@types/node": "10.0.4",
     "ava": "0.25.0",
-    "coveralls": "3.0.0",
+    "coveralls": "3.0.1",
     "cz-conventional-changelog": "2.0.0",
     "isomorphic-fetch": "2.2.1",
     "isomorphic-form-data": "1.0.0",
