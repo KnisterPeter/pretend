@@ -1,3 +1,4 @@
+// tslint:disable:no-implicit-dependencies
 import test from 'ava';
 import 'isomorphic-fetch';
 import 'isomorphic-form-data';
@@ -149,7 +150,7 @@ test('Pretend should call a post method with FormData', t => {
     })
     .post('/path/withFormData', /Content-Disposition: form-data; name="name"/)
     .reply(200, mockResponse);
-  return test.postWithFormData(new Buffer(10).toString('UTF-8'))
+  return test.postWithFormData(Buffer.alloc(10).toString('UTF-8'))
     .then(response => {
       t.deepEqual(response, mockResponse);
     });
@@ -164,7 +165,7 @@ test('Pretend should call a post method with FormData and query', t => {
     })
     .post('/path/withFormData?query=params', /Content-Disposition: form-data; name="name"/)
     .reply(200, mockResponse);
-  return test.postWithFormDataAndQuery({query: 'params'}, new Buffer(10).toString('UTF-8') )
+  return test.postWithFormDataAndQuery({query: 'params'}, Buffer.alloc(10).toString('UTF-8') )
     .then(response => {
       t.deepEqual(response, mockResponse);
     });

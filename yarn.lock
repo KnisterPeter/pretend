@@ -44,9 +44,9 @@
   dependencies:
     arrify "^1.0.1"
 
-"@knisterpeter/standard-tslint@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@knisterpeter/standard-tslint/-/standard-tslint-1.4.0.tgz#b1e6e588d551088baf5f2c8192533b8c65df4e19"
+"@knisterpeter/standard-tslint@1.7.2":
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/@knisterpeter/standard-tslint/-/standard-tslint-1.7.2.tgz#2a8e19d2a32332db425480fd0ab8d907fcca6380"
 
 "@ladjs/time-require@^0.1.4":
   version "0.1.4"

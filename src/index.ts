@@ -115,7 +115,7 @@ function execute(instance: Instance, method: string, tmpl: string, args: any[], 
  */
 export function methodDecoratorFactory(method: string, url: string, sendBody: boolean,
     appendQuery: boolean): MethodDecorator {
-  return (_target: Object, property: string, descriptor: TypedPropertyDescriptor<any>) => {
+  return (_target: object, property: string, descriptor: TypedPropertyDescriptor<any>) => {
     descriptor.value = function(this: Instance, ...args: any[]): Promise<any> {
       return execute(
         this,
@@ -135,7 +135,7 @@ export function methodDecoratorFactory(method: string, url: string, sendBody: bo
  * @internal
  */
 export function headerDecoratorFactory(headers: string|string[]): MethodDecorator {
-  return (_target: Object, _propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
+  return (_target: object, _propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
     const originalFunction: (...args: any[]) => Promise<any> = descriptor.value;
     descriptor.value = function(this: Instance, ...args: any[]): Promise<any> {
       return Promise.resolve()
@@ -171,18 +171,18 @@ export function headerDecoratorFactory(headers: string|string[]): MethodDecorato
 
 export class Pretend {
 
-  private static FetchInterceptor: Interceptor =
+  private static readonly FetchInterceptor: Interceptor =
     // tslint:disable-next-line
     (_chain: Chain, request: IPretendRequest) => fetch(request.url, request.options);
-  public static JsonDecoder: IPretendDecoder = (response: Response) => response.json();
-  public static TextDecoder: IPretendDecoder = (response: Response) => response.text();
-
-  private interceptors: Interceptor[] = [];
-  private decoder: IPretendDecoder = Pretend.JsonDecoder;
+  public static readonly JsonDecoder: IPretendDecoder = (response: Response) => response.json();
+  public static readonly TextDecoder: IPretendDecoder = (response: Response) => response.text();
 
   public static builder(): Pretend {
     return new Pretend();
   }
+
+  private readonly interceptors: Interceptor[] = [];
+  private decoder: IPretendDecoder = Pretend.JsonDecoder;
 
   public interceptor(interceptor: Interceptor): this {
     this.interceptors.push(interceptor);
@@ -201,7 +201,7 @@ export class Pretend {
     const auth = 'Basic '
       + (typeof (global as any).btoa !== 'undefined'
         ? (global as any).btoa(usernameAndPassword)
-        : new Buffer(usernameAndPassword, 'binary').toString('base64'));
+        : Buffer.from(usernameAndPassword, 'binary').toString('base64'));
     this.requestInterceptor((request) => {
       (request.options.headers as Headers).set('Authorization', auth);
       return request;
