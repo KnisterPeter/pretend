@@ -41,7 +41,7 @@
     "isomorphic-form-data": "1.0.0",
     "nock": "9.0.22",
     "nyc": "11.7.1",
-    "rimraf": "2.6.1",
+    "rimraf": "2.6.2",
     "source-map-support": "0.5.5",
     "standard-version": "4.3.0",
     "tslint": "5.10.0",
