@@ -86,7 +86,9 @@ function execute(instance: Instance, method: string, tmpl: string, args: any[], 
       const formData = new FormData();
       parameters.forEach(parameter => {
         const value = args[parameter.parameter];
-        formData.append(parameter.name, value, value.name);
+        if (value) {
+          formData.append(parameter.name, value, value.name);
+        }
       });
       return formData;
     }

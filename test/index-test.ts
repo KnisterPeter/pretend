@@ -15,6 +15,7 @@ interface Test {
   postWithQueryAndBody(_query: any, _body: any): Promise<any>;
   postWithFormData(_formData: any): Promise<any>;
   postWithFormDataAndQuery(_query: any, _formData: any): Promise<any>;
+  postWithEmptyFormDataAndQuery(_query: any, _formData: any): Promise<any>;
   put(): Promise<any>;
   putWithQuery(_parameters: any): Promise<any>;
   delete(_id: string): Promise<any>;
@@ -41,6 +42,8 @@ class TestImpl implements Test {
   public postWithFormData(@FormData('name') _formData: any): any { /* */ }
   @Post('/path/withFormData', true)
   public postWithFormDataAndQuery(_query: any, @FormData('name') _formData: any): any { /* */ }
+  @Post('/path/withFormData', true)
+  public postWithEmptyFormDataAndQuery(_query: any, @FormData('name') _formData: any): any { /* */ }
   @Put('/path')
   public put(): any { /* */ }
   @Put('/path', true)
@@ -159,13 +162,28 @@ test('Pretend should call a post method with FormData', t => {
 test('Pretend should call a post method with FormData and query', t => {
   const test = setup();
   nock('http://host:port/', {
-      reqheaders: {
-        'Content-Type': /^multipart\/form-data/
-      }
-    })
+    reqheaders: {
+      'Content-Type': /^multipart\/form-data/
+    }
+  })
     .post('/path/withFormData?query=params', /Content-Disposition: form-data; name="name"/)
     .reply(200, mockResponse);
-  return test.postWithFormDataAndQuery({query: 'params'}, Buffer.alloc(10).toString('UTF-8') )
+  return test.postWithFormDataAndQuery({ query: 'params' }, Buffer.alloc(10).toString('UTF-8'))
+    .then(response => {
+      t.deepEqual(response, mockResponse);
+    });
+});
+
+test('Pretend should call a post method with empty FormData and query', t => {
+  const test = setup();
+  nock('http://host:port/', {
+    reqheaders: {
+      'Content-Type': /^multipart\/form-data/
+    }
+  })
+    .post('/path/withFormData?query=params', undefined)
+    .reply(200, mockResponse);
+  return test.postWithEmptyFormDataAndQuery({ query: 'params' }, undefined)
     .then(response => {
       t.deepEqual(response, mockResponse);
     });
