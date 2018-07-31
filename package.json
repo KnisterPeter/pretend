@@ -14,8 +14,8 @@
     "prebuild": "npm run clean",
     "build": "tsc --sourceMap",
     "pretest": "npm run clean && tsc --inlineSourceMap",
-    "test": "nyc ava",
-    "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "test": "jest",
+    "coverage": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "watch:build": "tsc --watch --sourceMap",
     "watch:test": "npm test -- --watch",
     "prerelease": "git checkout master && git pull origin master && npm test && npm run build",
@@ -33,17 +33,18 @@
   "license": "MIT",
   "devDependencies": {
     "@knisterpeter/standard-tslint": "1.7.2",
+    "@types/jest": "23.3.1",
     "@types/node": "10.5.3",
-    "ava": "0.25.0",
     "coveralls": "3.0.2",
     "cz-conventional-changelog": "2.1.0",
     "isomorphic-fetch": "2.2.1",
     "isomorphic-form-data": "2.0.0",
+    "jest": "23.4.2",
     "nock": "9.4.3",
-    "nyc": "12.0.2",
     "rimraf": "2.6.2",
     "source-map-support": "0.5.6",
     "standard-version": "4.4.0",
+    "ts-jest": "23.0.1",
     "tslint": "5.11.0",
     "typescript": "2.9.2"
   },
@@ -56,22 +57,27 @@
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "ava": {
-    "files": [
-      "dist/test/**/*-test.js"
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "/test/.*\\.tsx?$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
     ],
-    "source": [
-      "dist/src/**/*.js"
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
     ],
-    "require": [
-      "source-map-support/register"
-    ]
-  },
-  "nyc": {
-    "exclude": [
-      "node_modules",
-      "coverage",
-      "dist/test"
+    "testURL": "http://localhost",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**"
     ]
   }
 }
