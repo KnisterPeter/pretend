@@ -45,3 +45,19 @@ export function FormData(name: string): ParameterDecorator {
     });
   };
 }
+
+export function FormEncoding(target: any, property: string | symbol, parameter: number): void {
+  if (!target.__pretend_parameter__) {
+    Object.defineProperty(target, '__pretend_parameter__', {
+      enumerable: false,
+      value: {}
+    });
+  }
+  if (!target.__pretend_parameter__[property]) {
+    target.__pretend_parameter__[property] = [];
+  }
+  target.__pretend_parameter__[property].push({
+    type: 'FormEncoding',
+    parameter
+  });
+}

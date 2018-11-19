@@ -3,6 +3,7 @@ import 'isomorphic-fetch';
 import 'isomorphic-form-data';
 import * as nock from 'nock';
 import { Delete, FormData, Get, Headers, Patch, Post, Pretend, Put } from '../src';
+import { FormEncoding } from '../src/decorators';
 
 interface Test {
   getSimple(): Promise<any>;
@@ -14,6 +15,7 @@ interface Test {
   postWithFormData(_formData: any): Promise<any>;
   postWithFormDataAndQuery(_query: any, _formData: any): Promise<any>;
   postWithEmptyFormDataAndQuery(_query: any, _formData: any): Promise<any>;
+  postWithUrlEncodedBody(_query: any, _body: any): Promise<any>;
   put(): Promise<any>;
   putWithQuery(_parameters: any): Promise<any>;
   delete(_id: string): Promise<any>;
@@ -42,6 +44,8 @@ class TestImpl implements Test {
   public postWithFormDataAndQuery(_query: any, @FormData('name') _formData: any): any { /* */ }
   @Post('/path/withFormData', true)
   public postWithEmptyFormDataAndQuery(_query: any, @FormData('name') _formData: any): any { /* */ }
+  @Post('/path/withUrlEncodedBody', true)
+  public postWithUrlEncodedBody(_query: any, @FormEncoding _body: any): any { /* */ }
   @Put('/path')
   public put(): any { /* */ }
   @Put('/path', true)
@@ -175,13 +179,24 @@ test('Pretend should call a post method with FormData and query', () => {
 test('Pretend should call a post method with empty FormData and query', () => {
   const test = setup();
   nock('http://host:port/', {
-    reqheaders: {
-      'Content-Type': /^multipart\/form-data/
-    }
-  })
+      reqheaders: {
+        'Content-Type': /^multipart\/form-data/
+      }
+    })
     .post('/path/withFormData?query=params', undefined)
     .reply(200, mockResponse);
   return test.postWithEmptyFormDataAndQuery({ query: 'params' }, undefined)
+    .then(response => {
+      expect(response).toEqual(mockResponse);
+    });
+});
+
+test('Pretend should call a post method and form-encode the body', () => {
+  const test = setup();
+  nock('http://host:port/')
+    .post('/path/withUrlEncodedBody?query=params', 'p1=d1&p2=a%20b')
+    .reply(200, mockResponse);
+  return test.postWithUrlEncodedBody({ query: 'params' }, { p1: 'd1', p2: 'a b' })
     .then(response => {
       expect(response).toEqual(mockResponse);
     });

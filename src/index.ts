@@ -1,4 +1,4 @@
-export {Get, Post, Put, Delete, Headers, Patch, FormData} from './decorators';
+export { Delete, FormData, FormEncoding, Get, Headers, Patch, Post, Put } from './decorators';
 
 export type IPretendDecoder = (response: Response) => Promise<any>;
 export type IPretendRequest = { url: string, options: RequestInit };
@@ -20,14 +20,21 @@ interface Instance {
       headers?: {[name: string]: string[]};
     };
     parameters: {
-      [method: string]: FormDataParameter[]
+      [method: string]: FormParameter[]
     }
   };
 }
 
+type FormParameter = FormDataParameter | FormEncodingParameter;
+
 interface FormDataParameter {
   type: 'FormData';
   name: string;
+  parameter: number;
+}
+
+interface FormEncodingParameter {
+  type: 'FormEncoding';
   parameter: number;
 }
 
@@ -42,12 +49,12 @@ function createUrl(url: string, args: any[]): [string, number] {
 function createQuery(parameters: object): string {
   return Object.keys(parameters)
     .reduce((query, name) => {
-      return `${query}&${name}=${encodeURIComponent(parameters[name])}`;
+      return `${query}&${encodeURIComponent(name)}=${encodeURIComponent(parameters[name])}`;
     }, '')
     .replace(/^&/, '?');
 }
 
-function filterFormData(args: any[], parameters?: FormDataParameter[]): any[] {
+function filterFormData(args: any[], parameters?: FormParameter[]): any[] {
   return args.filter((_, index) => {
     return !parameters || parameters.every(param => param.parameter !== index);
   });
@@ -80,17 +87,21 @@ function chainFactory(interceptors: Interceptor[]): (request: IPretendRequest) =
 }
 
 function execute(instance: Instance, method: string, tmpl: string, args: any[], sendBody: boolean,
-    appendQuery: boolean, parameters?: FormDataParameter[]): Promise<any> {
+    appendQuery: boolean, parameters?: FormParameter[]): Promise<any> {
   const createBody = () => {
     if (parameters) {
-      const formData = new FormData();
-      parameters.forEach(parameter => {
-        const value = args[parameter.parameter];
-        if (value) {
-          formData.append(parameter.name, value, value.name);
-        }
-      });
-      return formData;
+      if (parameters.some(parameter => parameter.type === 'FormData')) {
+        const formData = new FormData();
+        parameters.forEach((parameter: FormDataParameter) => {
+          const value = args[parameter.parameter];
+          if (value) {
+            formData.append(parameter.name, value, value.name);
+          }
+        });
+        return formData;
+      }
+      const body = args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex];
+      return createQuery(body).substr(1);
     }
     return sendBody ? JSON.stringify(args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex]) : undefined;
   };
