@@ -42,7 +42,7 @@
     "isomorphic-form-data": "2.0.0",
     "jest": "23.6.0",
     "nock": "10.0.6",
-    "rimraf": "2.6.2",
+    "rimraf": "2.6.3",
     "source-map-support": "0.5.9",
     "standard-version": "4.4.0",
     "ts-jest": "23.10.5",
