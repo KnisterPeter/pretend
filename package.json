@@ -33,7 +33,7 @@
   "license": "MIT",
   "devDependencies": {
     "@knisterpeter/standard-tslint": "1.7.2",
-    "@types/jest": "24.0.4",
+    "@types/jest": "24.0.5",
     "@types/node": "10.12.21",
     "codecov": "3.2.0",
     "coveralls": "3.0.2",
