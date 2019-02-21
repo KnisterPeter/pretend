@@ -47,7 +47,7 @@
     "standard-version": "5.0.0",
     "ts-jest": "24.0.0",
     "tslint": "5.12.1",
-    "typescript": "3.3.3"
+    "typescript": "3.3.3333"
   },
   "optionalDependencies": {
     "isomorphic-fetch": "2.2.1",
