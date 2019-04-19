@@ -34,7 +34,7 @@
   "devDependencies": {
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/jest": "24.0.11",
-    "@types/node": "10.14.4",
+    "@types/node": "10.14.5",
     "codecov": "3.3.0",
     "coveralls": "3.0.3",
     "cz-conventional-changelog": "2.1.0",
