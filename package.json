@@ -41,7 +41,7 @@
     "isomorphic-fetch": "2.2.1",
     "isomorphic-form-data": "2.0.0",
     "jest": "24.9.0",
-    "nock": "11.3.2",
+    "nock": "11.3.3",
     "rimraf": "3.0.0",
     "source-map-support": "0.5.13",
     "standard-version": "7.0.0",
