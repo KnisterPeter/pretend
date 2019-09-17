@@ -79,10 +79,9 @@ function prepareHeaders(instance: Instance): Headers {
   return headers;
 }
 
-function chainFactory(interceptors: Interceptor[]): (request: IPretendRequest) => Promise<Response> {
-  let i = 0;
+function chainFactory(interceptors: Interceptor[], i = 0): (request: IPretendRequest) => Promise<Response> {
   return function chainStep(request: IPretendRequest): Promise<Response> {
-    return interceptors[i++](chainStep, request);
+    return interceptors[i](chainFactory(interceptors, i + 1), request);
   };
 }
 
