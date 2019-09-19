@@ -355,3 +355,20 @@ test('Pretend should reset per-request data after error requests', () => {
       expect((test as any).__Pretend__.perRequest).toBeUndefined();
     });
 });
+
+test('Pretend should return from the interceptor with multiple chain calls', () => {
+  nock('http://host:port/')
+    .get('/path/id').reply(200, mockResponse)
+    .get('/path/id').reply(500, {});
+
+  const test: Test = Pretend.builder()
+    .interceptor((chain, request) => {
+      return chain(request).then(() => chain(request));
+    })
+    .target(TestImpl, 'http://host:port/');
+ 
+  return test.get('id')
+    .then(response => {
+      expect(response).toEqual(mockResponse);
+    });
+});
