@@ -366,7 +366,7 @@ test('Pretend should return from the interceptor with multiple chain calls', () 
       return chain(request).then(() => chain(request));
     })
     .target(TestImpl, 'http://host:port/');
- 
+
   return test.get('id')
     .then(response => {
       expect(response).toEqual(mockResponse);
