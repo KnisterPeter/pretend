@@ -43,7 +43,7 @@
     "jest": "25.4.0",
     "nock": "12.0.3",
     "rimraf": "3.0.2",
-    "source-map-support": "0.5.18",
+    "source-map-support": "0.5.19",
     "standard-version": "7.1.0",
     "ts-jest": "25.4.0",
     "tslint": "6.1.1",
