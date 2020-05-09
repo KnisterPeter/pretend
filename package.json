@@ -45,7 +45,7 @@
     "rimraf": "3.0.2",
     "source-map-support": "0.5.19",
     "standard-version": "8.0.0",
-    "ts-jest": "25.5.0",
+    "ts-jest": "25.5.1",
     "tslint": "6.1.2",
     "typescript": "3.8.3"
   },
