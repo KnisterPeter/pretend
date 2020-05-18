@@ -35,7 +35,7 @@
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/jest": "25.2.2",
     "@types/node": "10.17.17",
-    "codecov": "3.6.5",
+    "codecov": "3.7.0",
     "coveralls": "3.1.0",
     "cz-conventional-changelog": "3.2.0",
     "isomorphic-fetch": "2.2.1",
