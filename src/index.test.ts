@@ -1,7 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import 'isomorphic-fetch';
 import 'isomorphic-form-data';
-import * as nock from 'nock';
+import nock from 'nock';
 import { FormEncoding } from './decorators';
 import {
   Delete,

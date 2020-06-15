@@ -28,7 +28,7 @@ interface Instance {
     baseUrl: string;
     interceptors: Interceptor[];
     perRequest?: {
-      headers?: { [name: string]: string[] };
+      headers?: Record<string, string[]>;
     };
     parameters: {
       [method: string]: FormParameter[];
@@ -64,7 +64,9 @@ function createUrl(url: string, args: any[]): [string, number] {
   ];
 }
 
-function createQuery(parameters: object): string {
+function createQuery(
+  parameters: Record<string, string | number | boolean>
+): string {
   return Object.keys(parameters)
     .reduce((query, name) => {
       return `${query}&${encodeURIComponent(name)}=${encodeURIComponent(
@@ -129,12 +131,17 @@ function execute(
     if (parameters) {
       if (parameters.some((parameter) => parameter.type === 'FormData')) {
         const formData = new FormData();
-        parameters.forEach((parameter: FormDataParameter) => {
-          const value = args[parameter.parameter];
-          if (value) {
-            formData.append(parameter.name, value, value.name);
-          }
-        });
+        parameters
+          .filter(
+            (parameter): parameter is FormDataParameter =>
+              parameter.type === 'FormData'
+          )
+          .forEach((parameter: FormDataParameter) => {
+            const value = args[parameter.parameter];
+            if (value) {
+              formData.append(parameter.name, value, value.name);
+            }
+          });
         return formData;
       }
       const body = args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex];
@@ -175,7 +182,7 @@ export function methodDecoratorFactory(
 ): MethodDecorator {
   return (
     _target: object,
-    property: string,
+    property: string | symbol,
     descriptor: TypedPropertyDescriptor<any>
   ) => {
     descriptor.value = function (this: Instance, ...args: any[]): Promise<any> {
@@ -186,7 +193,7 @@ export function methodDecoratorFactory(
         args,
         sendBody,
         appendQuery,
-        (this.__Pretend__.parameters || {})[property]
+        (this.__Pretend__.parameters || {})[property.toString()]
       );
     };
     return descriptor;
@@ -201,7 +208,7 @@ export function headerDecoratorFactory(
 ): MethodDecorator {
   return (
     _target: object,
-    _propertyKey: string,
+    _propertyKey: string | symbol,
     descriptor: TypedPropertyDescriptor<any>
   ) => {
     const originalFunction: (...args: any[]) => Promise<any> = descriptor.value;
@@ -210,7 +217,7 @@ export function headerDecoratorFactory(
         this.__Pretend__.perRequest = {
           headers: (Array.isArray(headers) ? headers : [headers]).reduce(
             (akku, header) => {
-              const match = header.match(/([^:]+): *(.*)/);
+              const match = header.match(/([^:]+):\s*(.*)/);
               if (!match) {
                 throw new Error(`Invalid header format for '${header}'`);
               }
@@ -221,10 +228,12 @@ export function headerDecoratorFactory(
               akku[name].push(value);
               return akku;
             },
-            {}
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            {} as Record<string, string[]>
           )
         };
-        return (originalFunction.apply(this, args) as Promise<any>)
+        return originalFunction
+          .apply(this, args)
           .then((result) => {
             this.__Pretend__.perRequest = undefined;
             return result;

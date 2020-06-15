@@ -1,14 +1,9 @@
 {
   "compilerOptions": {
+    "incremental": true,
     "declaration": true,
     "experimentalDecorators": true,
-    "lib": [
-      "dom",
-      "es5",
-      "es2015.core",
-      "es2015.iterable",
-      "es2015.promise"
-    ],
+    "lib": ["dom", "esnext"],
     "module": "commonjs",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
@@ -20,14 +15,10 @@
     "noUnusedParameters": true,
     "outDir": "dist",
     "pretty": true,
-    "strictNullChecks": true,
+    "strict": true,
     "stripInternal": true,
-    "suppressImplicitAnyIndexErrors": true,
+    "esModuleInterop": true,
     "target": "es5"
   },
-  "exclude": [
-    "index.d.ts",
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["index.d.ts", "node_modules", "dist"]
 }
