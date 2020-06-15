@@ -15,7 +15,11 @@ export function Put(url: string, appendQuery = false): MethodDecorator {
   return methodDecoratorFactory('PUT', url, true, appendQuery);
 }
 
-export function Delete(url: string, sendBody = false, appendQuery = false): MethodDecorator {
+export function Delete(
+  url: string,
+  sendBody = false,
+  appendQuery = false
+): MethodDecorator {
   return methodDecoratorFactory('DELETE', url, sendBody, appendQuery);
 }
 
@@ -23,7 +27,7 @@ export function Patch(url: string): MethodDecorator {
   return methodDecoratorFactory('PATCH', url, true, false);
 }
 
-export function Headers(headers: string|string[]): MethodDecorator {
+export function Headers(headers: string | string[]): MethodDecorator {
   return headerDecoratorFactory(headers);
 }
 
@@ -46,7 +50,11 @@ export function FormData(name: string): ParameterDecorator {
   };
 }
 
-export function FormEncoding(target: any, property: string | symbol, parameter: number): void {
+export function FormEncoding(
+  target: any,
+  property: string | symbol,
+  parameter: number
+): void {
   if (!target.__pretend_parameter__) {
     Object.defineProperty(target, '__pretend_parameter__', {
       enumerable: false,

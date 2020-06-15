@@ -2,8 +2,17 @@
 import 'isomorphic-fetch';
 import 'isomorphic-form-data';
 import * as nock from 'nock';
-import { Delete, FormData, Get, Headers, Patch, Post, Pretend, Put } from '../src';
-import { FormEncoding } from '../src/decorators';
+import { FormEncoding } from './decorators';
+import {
+  Delete,
+  FormData,
+  Get,
+  Headers,
+  Patch,
+  Post,
+  Pretend,
+  Put
+} from './index';
 
 interface Test {
   getSimple(): Promise<any>;
@@ -26,38 +35,76 @@ interface Test {
 
 class TestImpl implements Test {
   @Get('/path', true)
-  public getSimple(): any { /* */ }
+  public getSimple(): any {
+    /* */
+  }
   @Get('/path/{id}')
-  public get(_id: string): any { /* */ }
+  public get(_id: string): any {
+    /* */
+  }
   @Get('/path/{id}', true)
-  public getWithQuery(_id: string, _parameters: any): any { /* */ }
+  public getWithQuery(_id: string, _parameters: any): any {
+    /* */
+  }
   @Headers('Accept: accept')
   @Get('/with/header')
-  public getWithHeader(): any { /* */ }
+  public getWithHeader(): any {
+    /* */
+  }
   @Post('/path')
-  public post(_body: any): any { /* */ }
+  public post(_body: any): any {
+    /* */
+  }
   @Post('/path', true)
-  public postWithQueryAndBody(): any { /* */ }
+  public postWithQueryAndBody(): any {
+    /* */
+  }
   @Post('/path/withFormData', true)
-  public postWithFormData(@FormData('name') _formData: any): any { /* */ }
+  public postWithFormData(@FormData('name') _formData: any): any {
+    /* */
+  }
   @Post('/path/withFormData', true)
-  public postWithFormDataAndQuery(_query: any, @FormData('name') _formData: any): any { /* */ }
+  public postWithFormDataAndQuery(
+    _query: any,
+    @FormData('name') _formData: any
+  ): any {
+    /* */
+  }
   @Post('/path/withFormData', true)
-  public postWithEmptyFormDataAndQuery(_query: any, @FormData('name') _formData: any): any { /* */ }
+  public postWithEmptyFormDataAndQuery(
+    _query: any,
+    @FormData('name') _formData: any
+  ): any {
+    /* */
+  }
   @Post('/path/withUrlEncodedBody', true)
-  public postWithUrlEncodedBody(_query: any, @FormEncoding _body: any): any { /* */ }
+  public postWithUrlEncodedBody(_query: any, @FormEncoding _body: any): any {
+    /* */
+  }
   @Put('/path')
-  public put(): any { /* */ }
+  public put(): any {
+    /* */
+  }
   @Put('/path', true)
-  public putWithQuery(_parameters: any): any { /* */ }
+  public putWithQuery(_parameters: any): any {
+    /* */
+  }
   @Delete('/path/:id')
-  public delete(_id: string): any { /* */ }
+  public delete(_id: string): any {
+    /* */
+  }
   @Delete('/path/:id', true)
-  public deleteBody(_id: string, _body: object): any { /* */ }
+  public deleteBody(_id: string, _body: object): any {
+    /* */
+  }
   @Delete('/path/:id', false, true)
-  public deleteWithQuery(_id: string, _query: object): any { /* */ }
+  public deleteWithQuery(_id: string, _query: object): any {
+    /* */
+  }
   @Patch('/path/:id')
-  public patchBody(_id: string, _body: object): any { /* */ }
+  public patchBody(_id: string, _body: object): any {
+    /* */
+  }
 }
 
 const mockResponse = {
@@ -71,41 +118,39 @@ function setup(): Test {
 test('Pretend should call a get method without any parameter or query', () => {
   const test = setup();
   nock('http://host:port/').get('/path').reply(200, mockResponse);
-  return test.getSimple()
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  return test.getSimple().then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a get method', () => {
   const test = setup();
   nock('http://host:port/').get('/path/id').reply(200, mockResponse);
-  return test.get('id')
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  return test.get('id').then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a get method with query parameters', () => {
   const test = setup();
   nock('http://host:port/').get('/path/id?a=b&c=d').reply(200, mockResponse);
-  return test.getWithQuery('id', {a: 'b', c: 'd'})
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  return test.getWithQuery('id', { a: 'b', c: 'd' }).then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a get method and add a custom header', () => {
   const test = setup();
   nock('http://host:port/', {
-      reqheaders: {
-        accept: 'accept'
-      }
-    }).get('/with/header').reply(200, mockResponse);
-  return test.getWithHeader()
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+    reqheaders: {
+      accept: 'accept'
+    }
+  })
+    .get('/with/header')
+    .reply(200, mockResponse);
+  return test.getWithHeader().then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should throw on wrong custom header format', () => {
@@ -113,13 +158,15 @@ test('Pretend should throw on wrong custom header format', () => {
   class Api {
     @Headers('syntactically-wrong')
     @Get('/path')
-    get(): Promise<string> { return undefined as any; };
+    get(): Promise<string> {
+      return undefined as any;
+    }
   }
   /* tslint:enable */
-  const test = Pretend.builder()
-    .target(Api, 'http://host:port/');
+  const test = Pretend.builder().target(Api, 'http://host:port/');
 
-  return test.get()
+  return test
+    .get()
     .then(() => {
       fail('should throw');
     })
@@ -130,18 +177,22 @@ test('Pretend should throw on wrong custom header format', () => {
 
 test('Pretend should call a post method', () => {
   const test = setup();
-  nock('http://host:port/').post('/path', {mockResponse}).reply(200, mockResponse);
-  return test.post({mockResponse})
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  nock('http://host:port/')
+    .post('/path', { mockResponse })
+    .reply(200, mockResponse);
+  return test.post({ mockResponse }).then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a post method with query and body', () => {
   const test = setup();
-  nock('http://host:port/').post('/path?query=param', {mockResponse}).reply(200, mockResponse);
-  return test.postWithQueryAndBody({ query: 'param' }, {mockResponse})
-    .then(response => {
+  nock('http://host:port/')
+    .post('/path?query=param', { mockResponse })
+    .reply(200, mockResponse);
+  return test
+    .postWithQueryAndBody({ query: 'param' }, { mockResponse })
+    .then((response) => {
       expect(response).toEqual(mockResponse);
     });
 });
@@ -149,14 +200,15 @@ test('Pretend should call a post method with query and body', () => {
 test('Pretend should call a post method with FormData', () => {
   const test = setup();
   nock('http://host:port/', {
-      reqheaders: {
-        'Content-Type': /^multipart\/form-data/
-      }
-    })
+    reqheaders: {
+      'Content-Type': /^multipart\/form-data/
+    }
+  })
     .post('/path/withFormData', /Content-Disposition: form-data; name="name"/)
     .reply(200, mockResponse);
-  return test.postWithFormData(Buffer.alloc(10).toString('UTF-8'))
-    .then(response => {
+  return test
+    .postWithFormData(Buffer.alloc(10).toString('UTF-8'))
+    .then((response) => {
       expect(response).toEqual(mockResponse);
     });
 });
@@ -168,10 +220,17 @@ test('Pretend should call a post method with FormData and query', () => {
       'Content-Type': /^multipart\/form-data/
     }
   })
-    .post('/path/withFormData?query=params', /Content-Disposition: form-data; name="name"/)
+    .post(
+      '/path/withFormData?query=params',
+      /Content-Disposition: form-data; name="name"/
+    )
     .reply(200, mockResponse);
-  return test.postWithFormDataAndQuery({ query: 'params' }, Buffer.alloc(10).toString('UTF-8'))
-    .then(response => {
+  return test
+    .postWithFormDataAndQuery(
+      { query: 'params' },
+      Buffer.alloc(10).toString('UTF-8')
+    )
+    .then((response) => {
       expect(response).toEqual(mockResponse);
     });
 });
@@ -179,14 +238,15 @@ test('Pretend should call a post method with FormData and query', () => {
 test('Pretend should call a post method with empty FormData and query', () => {
   const test = setup();
   nock('http://host:port/', {
-      reqheaders: {
-        'Content-Type': /^multipart\/form-data/
-      }
-    })
+    reqheaders: {
+      'Content-Type': /^multipart\/form-data/
+    }
+  })
     .post('/path/withFormData?query=params', undefined)
     .reply(200, mockResponse);
-  return test.postWithEmptyFormDataAndQuery({ query: 'params' }, undefined)
-    .then(response => {
+  return test
+    .postWithEmptyFormDataAndQuery({ query: 'params' }, undefined)
+    .then((response) => {
       expect(response).toEqual(mockResponse);
     });
 });
@@ -196,8 +256,9 @@ test('Pretend should call a post method and form-encode the body', () => {
   nock('http://host:port/')
     .post('/path/withUrlEncodedBody?query=params', 'p1=d1&p2=a%20b')
     .reply(200, mockResponse);
-  return test.postWithUrlEncodedBody({ query: 'params' }, { p1: 'd1', p2: 'a b' })
-    .then(response => {
+  return test
+    .postWithUrlEncodedBody({ query: 'params' }, { p1: 'd1', p2: 'a b' })
+    .then((response) => {
       expect(response).toEqual(mockResponse);
     });
 });
@@ -205,34 +266,32 @@ test('Pretend should call a post method and form-encode the body', () => {
 test('Pretend should call a put method', () => {
   const test: Test = Pretend.builder().target(TestImpl, 'http://host:port');
   nock('http://host:port/').put('/path').reply(200, mockResponse);
-  return test.put()
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  return test.put().then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a put method with query parameters', () => {
   const test = setup();
   nock('http://host:port/').put('/path?query=param').reply(200, mockResponse);
-  return test.putWithQuery({query: 'param'})
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  return test.putWithQuery({ query: 'param' }).then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a delete method', () => {
   const test = setup();
   nock('http://host:port/').delete('/path/id').reply(200, mockResponse);
-  return test.delete('id')
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  return test.delete('id').then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should throw on error', () => {
   const test = setup();
   nock('http://host:port/').delete('/path/id').replyWithError('server-fail');
-  return test.delete('id')
+  return test
+    .delete('id')
     .then(() => {
       fail('should throw');
     })
@@ -243,36 +302,41 @@ test('Pretend should throw on error', () => {
 
 test('Pretend should call a delete method and send a body', () => {
   const test = setup();
-  nock('http://host:port/').delete('/path/id', {data: 'data'}).reply(200, mockResponse);
-  return test.deleteBody('id', {data: 'data'})
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  nock('http://host:port/')
+    .delete('/path/id', { data: 'data' })
+    .reply(200, mockResponse);
+  return test.deleteBody('id', { data: 'data' }).then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a delete method and append query parameters', () => {
   const test = setup();
-  nock('http://host:port/').delete('/path/id?param=value').reply(200, mockResponse);
-  return test.deleteWithQuery('id', {param: 'value'})
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  nock('http://host:port/')
+    .delete('/path/id?param=value')
+    .reply(200, mockResponse);
+  return test.deleteWithQuery('id', { param: 'value' }).then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should call a patch method and send a body', () => {
   const test = setup();
-  nock('http://host:port/').patch('/path/id', {data: 'data'}).reply(200, mockResponse);
-  return test.patchBody('id', {data: 'data'})
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  nock('http://host:port/')
+    .patch('/path/id', { data: 'data' })
+    .reply(200, mockResponse);
+  return test.patchBody('id', { data: 'data' }).then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });
 
 test('Pretend should return content based on decoder configuration', () => {
   /* tslint:disable */
   class Api {
     @Get('/path')
-    get(): Promise<string> { return undefined as any; };
+    get(): Promise<string> {
+      return undefined as any;
+    }
   }
   /* tslint:enable */
   nock('http://host:port/').get('/path').reply(200, 'some-string');
@@ -284,41 +348,43 @@ test('Pretend should return content based on decoder configuration', () => {
     })
     .target(Api, 'http://host:port/');
 
-  return api.get()
-    .then(text => {
-      expect(decoderCalled).toBeTruthy();
-      expect(text).toBe('some-string');
-    });
+  return api.get().then((text) => {
+    expect(decoderCalled).toBeTruthy();
+    expect(text).toBe('some-string');
+  });
 });
 
 test('Pretend should use basic auth if configured', () => {
   /* tslint:disable */
   class Api {
     @Get('/')
-    get(): Promise<any> { return undefined as any; };
+    get(): Promise<any> {
+      return undefined as any;
+    }
   }
   /* tslint:enable */
   nock('http://host:port/', {
-      reqheaders: {
-        Authorization: 'Basic QWxhZGRpbjpPcGVuU2VzYW1l'
-      }
-    })
+    reqheaders: {
+      Authorization: 'Basic QWxhZGRpbjpPcGVuU2VzYW1l'
+    }
+  })
     .get('/')
     .reply(200, '{}');
 
   const api = Pretend.builder()
     .basicAuthentication('Aladdin', 'OpenSesame')
     .target(Api, 'http://host:port');
-  return api.get()
-    .then(response => {
-      expect(response).toEqual({});
-    });
+  return api.get().then((response) => {
+    expect(response).toEqual({});
+  });
 });
 
 test('Pretend should return from the interceptor', () => {
   nock('http://host:port/')
-    .get('/path/id').reply(200, mockResponse)
-    .get('/path/id').reply(500, {});
+    .get('/path/id')
+    .reply(200, mockResponse)
+    .get('/path/id')
+    .reply(500, {});
 
   let firstReponse: any = undefined;
   const test: Test = Pretend.builder()
@@ -330,9 +396,10 @@ test('Pretend should return from the interceptor', () => {
     })
     .target(TestImpl, 'http://host:port/');
   // first call gets through
-  return test.get('id')
+  return test
+    .get('id')
     .then(() => test.get('id'))
-    .then(response => {
+    .then((response) => {
       // second should be return from the interceptor (nock would fail)
       expect(response).toEqual(mockResponse);
     });
@@ -341,25 +408,25 @@ test('Pretend should return from the interceptor', () => {
 test('Pretend should reset per-request data after each request', () => {
   const test = setup();
   nock('http://host:port/').get('/with/header').reply(200, mockResponse);
-  return test.getWithHeader()
-    .then(() => {
-      expect((test as any).__Pretend__.perRequest).toBeUndefined();
-    });
+  return test.getWithHeader().then(() => {
+    expect((test as any).__Pretend__.perRequest).toBeUndefined();
+  });
 });
 
 test('Pretend should reset per-request data after error requests', () => {
   const test = setup();
   nock('http://host:port/').get('/with/header').replyWithError('failed');
-  return test.getWithHeader()
-    .catch(() => {
-      expect((test as any).__Pretend__.perRequest).toBeUndefined();
-    });
+  return test.getWithHeader().catch(() => {
+    expect((test as any).__Pretend__.perRequest).toBeUndefined();
+  });
 });
 
 test('Pretend should return from the interceptor with multiple chain calls', () => {
   nock('http://host:port/')
-    .get('/path/id').reply(200, mockResponse)
-    .get('/path/id').reply(500, {});
+    .get('/path/id')
+    .reply(200, mockResponse)
+    .get('/path/id')
+    .reply(500, {});
 
   const test: Test = Pretend.builder()
     .interceptor((chain, request) => {
@@ -367,8 +434,7 @@ test('Pretend should return from the interceptor with multiple chain calls', () 
     })
     .target(TestImpl, 'http://host:port/');
 
-  return test.get('id')
-    .then(response => {
-      expect(response).toEqual(mockResponse);
-    });
+  return test.get('id').then((response) => {
+    expect(response).toEqual(mockResponse);
+  });
 });

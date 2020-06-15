@@ -1,6 +1,8 @@
 {
   "extends": "@knisterpeter/standard-tslint",
   "rules": {
-    "promise-function-async": false
+    "promise-function-async": false,
+    "space-before-function-paren": false,
+    "semicolon": false
   }
 }

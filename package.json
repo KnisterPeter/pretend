@@ -36,12 +36,11 @@
     "@types/jest": "26.0.0",
     "@types/node": "10.17.17",
     "codecov": "3.7.0",
-    "coveralls": "3.1.0",
-    "cz-conventional-changelog": "3.2.0",
     "isomorphic-fetch": "2.2.1",
     "isomorphic-form-data": "2.0.0",
     "jest": "26.0.1",
     "nock": "12.0.3",
+    "prettier": "2.0.5",
     "rimraf": "3.0.2",
     "source-map-support": "0.5.19",
     "standard-version": "8.0.0",
@@ -53,27 +52,15 @@
     "isomorphic-fetch": "2.2.1",
     "isomorphic-form-data": "2.0.0"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "none"
   },
   "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "/test/.*\\.tsx?$",
+    "preset": "ts-jest",
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist/"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
     ],
     "testURL": "http://localhost",
     "collectCoverage": true,
