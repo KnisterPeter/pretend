@@ -1,22 +1,21 @@
 # pretend
 
+[![npm](https://img.shields.io/npm/v/pretend.svg)](https://www.npmjs.com/package/pretend)
 [![GitHub license](https://img.shields.io/github/license/KnisterPeter/pretend.svg)](https://github.com/KnisterPeter/pretend)
-[![Travis](https://img.shields.io/travis/KnisterPeter/pretend.svg)](https://travis-ci.org/KnisterPeter/pretend)
-[![codecov](https://codecov.io/gh/KnisterPeter/pretend/branch/master/graph/badge.svg)](https://codecov.io/gh/KnisterPeter/pretend)[![npm](https://img.shields.io/npm/v/pretend.svg)](https://www.npmjs.com/package/pretend)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
+![build](https://github.com/KnisterPeter/pretend/workflows/build/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/KnisterPeter/pretend/branch/master/graph/badge.svg)](https://codecov.io/gh/KnisterPeter/pretend)
 [![renovate badge](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovateapp.com/)
 
 A decorator based http webservice client build with typescript (inspired bei [feign](https://github.com/OpenFeign/feign)).
 
 ## Features
 
-* Handle REST based webservices
-* Configure a decoder (defaults to JSON)
-* Generic request/response interceptor chain
-* Basic authentication
-* Request parameters (currently on GET requests)
-* Custom headers per method
+- Handle REST based webservices
+- Configure a decoder (defaults to JSON)
+- Generic request/response interceptor chain
+- Basic authentication
+- Request parameters (currently on GET requests)
+- Custom headers per method
 
 ## Usage
 
@@ -69,31 +68,27 @@ Decoders, basicAuthentication and requestInterceptors are all special forms
 of the more generic interceptors which could be chained per request/response.
 
 ```js
-  // Configure a text based decoder
-  const client = Pretend
-                  .builder()
-                  .decoder(Pretend.TextDecoder)
-                  .target(Test, 'http://host:port/');
+// Configure a text based decoder
+const client = Pretend.builder()
+  .decoder(Pretend.TextDecoder)
+  .target(Test, "http://host:port/");
 ```
 
 ```js
-  // Configure basic authentication
-  const client = Pretend
-                  .builder()
-                  .basicAuthentication('user', 'pass')
-                  .target(Test, 'http://host:port/');
+// Configure basic authentication
+const client = Pretend.builder()
+  .basicAuthentication("user", "pass")
+  .target(Test, "http://host:port/");
 ```
 
-
 ```js
-  // Configure a request interceptor
-  const client = Pretend
-                  .builder()
-                  .requestInterceptor((request) => {
-                    request.options.headers['X-Custom-Header'] = 'value';
-                    return request;
-                  })
-                  .target(Test, 'http://host:port/');
+// Configure a request interceptor
+const client = Pretend.builder()
+  .requestInterceptor((request) => {
+    request.options.headers["X-Custom-Header"] = "value";
+    return request;
+  })
+  .target(Test, "http://host:port/");
 ```
 
 #### Interceptors
@@ -102,22 +97,21 @@ Multiple interceptors could be added to each builder. The order of interceptor
 calls will result in a chain of calls like illistrated below:
 
 ```js
-  // Configure a request interceptor
-  const client = Pretend
-                  .builder()
-                  .interceptor(async (chain, request) => {
-                    console.log('interceptor 1: request');
-                    const response = await chain(request);
-                    console.log('interceptor 1: response');
-                    return response;
-                  })
-                  .interceptor(async (chain, request) => {
-                    console.log('interceptor 2: request');
-                    const response = await chain(request);
-                    console.log('interceptor 2: response');
-                    return response;
-                  })
-                  .target(Test, 'http://host:port/');
+// Configure a request interceptor
+const client = Pretend.builder()
+  .interceptor(async (chain, request) => {
+    console.log("interceptor 1: request");
+    const response = await chain(request);
+    console.log("interceptor 1: response");
+    return response;
+  })
+  .interceptor(async (chain, request) => {
+    console.log("interceptor 2: request");
+    const response = await chain(request);
+    console.log("interceptor 2: response");
+    return response;
+  })
+  .target(Test, "http://host:port/");
 ```
 
 ```text
@@ -139,4 +133,4 @@ interceptor 1: response
 
 ## Future ideas / Roadmap
 
-* Named parameters
+- Named parameters
