@@ -3,9 +3,9 @@
   "version": "3.0.0",
   "description": "A decorator based http webservice client written in typescript",
   "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "files": [
     "dist",
-    "index.d.ts",
     "src"
   ],
   "scripts": {

@@ -1,23 +1,21 @@
 sudo: false
 language: node_js
 node_js:
-- 'stable'
-- '12'
-- '10'
+  - "14"
+  - "12"
+  - "10"
 matrix:
   fast_finish: true
 branches:
   only:
     - master
-    - /^greenkeeper-.*$/
-    - /^greenkeeper/.*$/
 cache:
   directories:
-  - node_modules
+    - node_modules
 notifications:
   email:
     on_success: never
 
-before_script: 'npm run linter'
-script: 'npm run test'
-after_script: 'npm run coverage'
+before_script: "npm run linter"
+script: "npm run test"
+after_script: "npm run coverage"
