@@ -1,3 +1,12 @@
+## [3.0.2](https://github.com/KnisterPeter/pretend/compare/v3.0.1...v3.0.2) (2020-06-15)
+
+
+### Bug Fixes
+
+* correct package entries ([#525](https://github.com/KnisterPeter/pretend/issues/525)) ([381dc80](https://github.com/KnisterPeter/pretend/commit/381dc8033ae83e5910578db2c618db8bf9f1d75d))
+
+
+
 ## [3.0.1](https://github.com/KnisterPeter/pretend/compare/v3.0.0...v3.0.1) (2020-06-15)
 
 ## [3.0.0](https://github.com/KnisterPeter/pretend/compare/v2.0.0...v3.0.0) (2019-09-19)
