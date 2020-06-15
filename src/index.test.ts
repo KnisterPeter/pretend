@@ -2,7 +2,7 @@
 import 'isomorphic-fetch';
 import 'isomorphic-form-data';
 import nock from 'nock';
-import { FormEncoding } from './decorators';
+import { FormEncoding, ResponseType } from './decorators';
 import {
   Delete,
   FormData,
@@ -13,6 +13,24 @@ import {
   Pretend,
   Put
 } from './index';
+
+class UserClass {
+  public static transform({
+    firstName,
+    lastName
+  }: {
+    firstName: string;
+    lastName: string;
+  }): ConstructorParameters<typeof UserClass> {
+    return [{ user: `${firstName} ${lastName}` }];
+  }
+
+  public readonly user: string;
+
+  constructor(data: { user: string }) {
+    this.user = data.user;
+  }
+}
 
 interface Test {
   getSimple(): Promise<any>;
@@ -31,6 +49,8 @@ interface Test {
   deleteBody(_id: string, _body: object): Promise<any>;
   deleteWithQuery(_id: string, _query: object): Promise<any>;
   patchBody(_id: string, _body: object): Promise<any>;
+  withResponseType(): Promise<UserClass>;
+  withResponseTypeAndTransform(): Promise<UserClass>;
 }
 
 class TestImpl implements Test {
@@ -103,6 +123,16 @@ class TestImpl implements Test {
   }
   @Patch('/path/:id')
   public patchBody(_id: string, _body: object): any {
+    /* */
+  }
+  @Get('/some/url')
+  @ResponseType(UserClass)
+  public withResponseType(): any {
+    /* */
+  }
+  @Get('/some/other/url')
+  @ResponseType(UserClass, UserClass.transform)
+  public withResponseTypeAndTransform(): any {
     /* */
   }
 }
@@ -456,4 +486,32 @@ test('Pretend should return from the interceptor with multiple chain calls', asy
   const response = await test.get('id');
 
   expect(response).toEqual(mockResponse);
+});
+
+test('Pretend should map responses to a given result type', async () => {
+  const scope = nock('http://host:port/')
+    .get('/some/url')
+    .reply(200, { user: 'name' });
+
+  const test: Test = Pretend.builder().target(TestImpl, 'http://host:port/');
+  const response = await test.withResponseType();
+
+  expect(response).toBeInstanceOf(UserClass);
+  expect(response.user).toBe('name');
+
+  scope.done();
+});
+
+test('Pretend should map responses to a given result type using a transform', async () => {
+  const scope = nock('http://host:port/')
+    .get('/some/other/url')
+    .reply(200, { firstName: 'firstname', lastName: 'lastname' });
+
+  const test: Test = Pretend.builder().target(TestImpl, 'http://host:port/');
+  const response = await test.withResponseTypeAndTransform();
+
+  expect(response).toBeInstanceOf(UserClass);
+  expect(response.user).toBe('firstname lastname');
+
+  scope.done();
 });

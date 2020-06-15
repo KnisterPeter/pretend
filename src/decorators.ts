@@ -1,4 +1,8 @@
-import { headerDecoratorFactory, methodDecoratorFactory } from './index';
+import {
+  headerDecoratorFactory,
+  methodDecoratorFactory,
+  resourceTypeDecoratorFactory
+} from './index';
 
 export function Get(url: string, appendQuery?: boolean): MethodDecorator {
   if (typeof appendQuery === 'undefined') {
@@ -68,4 +72,14 @@ export function FormEncoding(
     type: 'FormEncoding',
     parameter
   });
+}
+
+export function ResponseType<
+  T extends { new (...args: any[]): any },
+  P = ConstructorParameters<T>
+>(
+  type: T,
+  transform: (data: any) => P = (data: any) => [data] as any
+): MethodDecorator {
+  return resourceTypeDecoratorFactory(type, transform);
 }

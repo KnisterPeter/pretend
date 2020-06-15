@@ -71,24 +71,24 @@ of the more generic interceptors which could be chained per request/response.
 // Configure a text based decoder
 const client = Pretend.builder()
   .decoder(Pretend.TextDecoder)
-  .target(Test, "http://host:port/");
+  .target(Test, 'http://host:port/');
 ```
 
 ```js
 // Configure basic authentication
 const client = Pretend.builder()
-  .basicAuthentication("user", "pass")
-  .target(Test, "http://host:port/");
+  .basicAuthentication('user', 'pass')
+  .target(Test, 'http://host:port/');
 ```
 
 ```js
 // Configure a request interceptor
 const client = Pretend.builder()
   .requestInterceptor((request) => {
-    request.options.headers["X-Custom-Header"] = "value";
+    request.options.headers['X-Custom-Header'] = 'value';
     return request;
   })
-  .target(Test, "http://host:port/");
+  .target(Test, 'http://host:port/');
 ```
 
 #### Interceptors
@@ -100,18 +100,18 @@ calls will result in a chain of calls like illistrated below:
 // Configure a request interceptor
 const client = Pretend.builder()
   .interceptor(async (chain, request) => {
-    console.log("interceptor 1: request");
+    console.log('interceptor 1: request');
     const response = await chain(request);
-    console.log("interceptor 1: response");
+    console.log('interceptor 1: response');
     return response;
   })
   .interceptor(async (chain, request) => {
-    console.log("interceptor 2: request");
+    console.log('interceptor 2: request');
     const response = await chain(request);
-    console.log("interceptor 2: response");
+    console.log('interceptor 2: response');
     return response;
   })
-  .target(Test, "http://host:port/");
+  .target(Test, 'http://host:port/');
 ```
 
 ```text
@@ -129,6 +129,73 @@ interceptor 1: request
 interceptor 2: request
 interceptor 2: response
 interceptor 1: response
+```
+
+### Data Mappers
+
+DataMappers could be used to map response structures to TypeScript classes.
+This is done using the `@ResponseType` decorator.
+
+```ts
+class User {
+  public name: string;
+
+  constuctor(data: { name: string }) {
+    this.name = data.name;
+  }
+}
+
+class API {
+  @Get('/path/{id}')
+  @ResponseType(User)
+  public async loadUser(id: string): Promise<User> {
+    /*
+     * `/path/{id}` returns a JSON like this from the server:
+     *
+     *  {
+     *    name: 'some string'
+     *  }
+     */
+  }
+}
+
+const client = Pretend.builder().target(API, 'http://host:port/');
+const result: User = await client.loadUser(1);
+```
+
+There is a second parameter to the `@ResponseType` decorator which is a transform function.
+The input is the server response, the output need to match the class constructor parameters.
+
+**Note**: The constructor parameters are always an array!
+
+```ts
+class User {
+  public get name(): string {
+    return this.data.name;
+  }
+
+  constuctor(private data: { name: string }) {}
+}
+
+class API {
+  @Get('/path/{id}')
+  @ResponseType(User, (data) => [
+    { name: `${data.firstname} ${data.lastname}` }
+  ])
+  public async loadUser(id: string): Promise<User> {
+    /*
+     * `/path/{id}` returns a JSON like this from the server:
+     *
+     *  {
+     *    firstname: 'John',
+     *    lastname: 'Doe'
+     *  }
+     */
+  }
+}
+
+const client = Pretend.builder().target(API, 'http://host:port/');
+const result: User = await client.loadUser(1);
 ```
 
 ## Future ideas / Roadmap

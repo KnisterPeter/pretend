@@ -11,13 +11,12 @@
   "scripts": {
     "linter": "tslint --project ./tsconfig.json",
     "clean": "rimraf dist",
-    "prebuild": "npm run clean",
+    "prebuild": "yarn clean",
     "build": "tsc --sourceMap",
-    "pretest": "npm run clean && tsc --inlineSourceMap",
     "test": "jest",
     "coverage": "codecov",
     "watch:build": "tsc --watch --sourceMap",
-    "watch:test": "npm test -- --watch"
+    "watch:test": "yarn test -- --watch"
   },
   "repository": {
     "type": "git",

@@ -33,6 +33,7 @@ interface Instance {
     parameters: {
       [method: string]: FormParameter[];
     };
+    dataMapper?(data: any): any;
   };
 }
 
@@ -47,6 +48,32 @@ interface FormDataParameter {
 interface FormEncodingParameter {
   type: 'FormEncoding';
   parameter: number;
+}
+
+function createDataMapper(
+  target: object,
+  property: string | symbol,
+  mapper: (response: any) => any
+): void {
+  let dataMappers = (target as any).__dataMappers__;
+  if (!dataMappers) {
+    dataMappers = {};
+    Object.defineProperty(target, '__dataMappers__', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: dataMappers
+    });
+  }
+  dataMappers[property] = mapper;
+}
+
+function getDataMapper(
+  target: object,
+  property: string | symbol
+): (response: any) => any {
+  const dataMappers = (target as any).__dataMappers__;
+  return dataMappers?.[property];
 }
 
 function createUrl(url: string, args: any[]): [string, number] {
@@ -181,11 +208,13 @@ export function methodDecoratorFactory(
   appendQuery: boolean
 ): MethodDecorator {
   return (
-    _target: object,
+    target: object,
     property: string | symbol,
     descriptor: TypedPropertyDescriptor<any>
   ) => {
     descriptor.value = function (this: Instance, ...args: any[]): Promise<any> {
+      this.__Pretend__.dataMapper = getDataMapper(target, property);
+
       return execute(
         this,
         method,
@@ -245,6 +274,19 @@ export function headerDecoratorFactory(
       });
     };
     return descriptor;
+  };
+}
+
+export function resourceTypeDecoratorFactory<
+  T extends { new (...args: any[]): T },
+  P = ConstructorParameters<T>
+>(type: T, transform: (data: any) => P): MethodDecorator {
+  return (target: object, property: string | symbol) => {
+    createDataMapper(
+      target,
+      property,
+      (data: any) => new type(...(transform(data) as any))
+    );
   };
 }
 
@@ -309,13 +351,28 @@ export class Pretend {
     this.interceptors.push(Pretend.FetchInterceptor);
 
     const instance = new descriptor() as T & Instance;
-    instance.__Pretend__ = {
-      baseUrl: baseUrl.endsWith('/')
-        ? baseUrl.substring(0, baseUrl.length - 1)
-        : baseUrl,
-      interceptors: this.interceptors,
-      parameters: descriptor.prototype.__pretend_parameter__
-    };
+    Object.defineProperty(instance, '__Pretend__', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: {
+        baseUrl: baseUrl.endsWith('/')
+          ? baseUrl.substring(0, baseUrl.length - 1)
+          : baseUrl,
+        interceptors: this.interceptors,
+        parameters: descriptor.prototype.__pretend_parameter__
+      }
+    });
+
+    this.interceptors.unshift(async (chain, request) => {
+      let response = await chain(request);
+      if (instance.__Pretend__.dataMapper) {
+        response = instance.__Pretend__.dataMapper(response);
+        instance.__Pretend__.dataMapper = undefined;
+      }
+      return response;
+    });
+
     return instance;
   }
 }
