@@ -38,3 +38,5 @@ jobs:
           yarn test
       - run: |
           yarn coverage
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
