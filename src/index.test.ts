@@ -115,31 +115,34 @@ function setup(): Test {
   return Pretend.builder().target(TestImpl, 'http://host:port/');
 }
 
-test('Pretend should call a get method without any parameter or query', () => {
+test('Pretend should call a get method without any parameter or query', async () => {
   const test = setup();
   nock('http://host:port/').get('/path').reply(200, mockResponse);
-  return test.getSimple().then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.getSimple();
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a get method', () => {
+test('Pretend should call a get method', async () => {
   const test = setup();
   nock('http://host:port/').get('/path/id').reply(200, mockResponse);
-  return test.get('id').then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.get('id');
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a get method with query parameters', () => {
+test('Pretend should call a get method with query parameters', async () => {
   const test = setup();
   nock('http://host:port/').get('/path/id?a=b&c=d').reply(200, mockResponse);
-  return test.getWithQuery('id', { a: 'b', c: 'd' }).then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.getWithQuery('id', { a: 'b', c: 'd' });
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a get method and add a custom header', () => {
+test('Pretend should call a get method and add a custom header', async () => {
   const test = setup();
   nock('http://host:port/', {
     reqheaders: {
@@ -148,12 +151,13 @@ test('Pretend should call a get method and add a custom header', () => {
   })
     .get('/with/header')
     .reply(200, mockResponse);
-  return test.getWithHeader().then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.getWithHeader();
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should throw on wrong custom header format', () => {
+test('Pretend should throw on wrong custom header format', async () => {
   /* tslint:disable */
   class Api {
     @Headers('syntactically-wrong')
@@ -165,39 +169,40 @@ test('Pretend should throw on wrong custom header format', () => {
   /* tslint:enable */
   const test = Pretend.builder().target(Api, 'http://host:port/');
 
-  return test
-    .get()
-    .then(() => {
-      fail('should throw');
-    })
-    .catch(() => {
-      // nothing to do here
-    });
+  try {
+    await test.get();
+    fail('should throw');
+  } catch (e) {
+    // all good, nothing to do
+  }
 });
 
-test('Pretend should call a post method', () => {
+test('Pretend should call a post method', async () => {
   const test = setup();
   nock('http://host:port/')
     .post('/path', { mockResponse })
     .reply(200, mockResponse);
-  return test.post({ mockResponse }).then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.post({ mockResponse });
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a post method with query and body', () => {
+test('Pretend should call a post method with query and body', async () => {
   const test = setup();
   nock('http://host:port/')
     .post('/path?query=param', { mockResponse })
     .reply(200, mockResponse);
-  return test
-    .postWithQueryAndBody({ query: 'param' }, { mockResponse })
-    .then((response) => {
-      expect(response).toEqual(mockResponse);
-    });
+
+  const response = await test.postWithQueryAndBody(
+    { query: 'param' },
+    { mockResponse }
+  );
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a post method with FormData', () => {
+test('Pretend should call a post method with FormData', async () => {
   const test = setup();
   nock('http://host:port/', {
     reqheaders: {
@@ -206,14 +211,15 @@ test('Pretend should call a post method with FormData', () => {
   })
     .post('/path/withFormData', /Content-Disposition: form-data; name="name"/)
     .reply(200, mockResponse);
-  return test
-    .postWithFormData(Buffer.alloc(10).toString('UTF-8'))
-    .then((response) => {
-      expect(response).toEqual(mockResponse);
-    });
+
+  const response = await test.postWithFormData(
+    Buffer.alloc(10).toString('UTF-8')
+  );
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a post method with FormData and query', () => {
+test('Pretend should call a post method with FormData and query', async () => {
   const test = setup();
   nock('http://host:port/', {
     reqheaders: {
@@ -225,17 +231,16 @@ test('Pretend should call a post method with FormData and query', () => {
       /Content-Disposition: form-data; name="name"/
     )
     .reply(200, mockResponse);
-  return test
-    .postWithFormDataAndQuery(
-      { query: 'params' },
-      Buffer.alloc(10).toString('UTF-8')
-    )
-    .then((response) => {
-      expect(response).toEqual(mockResponse);
-    });
+
+  const response = await test.postWithFormDataAndQuery(
+    { query: 'params' },
+    Buffer.alloc(10).toString('UTF-8')
+  );
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a post method with empty FormData and query', () => {
+test('Pretend should call a post method with empty FormData and query', async () => {
   const test = setup();
   nock('http://host:port/', {
     reqheaders: {
@@ -244,93 +249,102 @@ test('Pretend should call a post method with empty FormData and query', () => {
   })
     .post('/path/withFormData?query=params', undefined)
     .reply(200, mockResponse);
-  return test
-    .postWithEmptyFormDataAndQuery({ query: 'params' }, undefined)
-    .then((response) => {
-      expect(response).toEqual(mockResponse);
-    });
+
+  const response = await test.postWithEmptyFormDataAndQuery(
+    { query: 'params' },
+    undefined
+  );
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a post method and form-encode the body', () => {
+test('Pretend should call a post method and form-encode the body', async () => {
   const test = setup();
   nock('http://host:port/')
     .post('/path/withUrlEncodedBody?query=params', 'p1=d1&p2=a%20b')
     .reply(200, mockResponse);
-  return test
-    .postWithUrlEncodedBody({ query: 'params' }, { p1: 'd1', p2: 'a b' })
-    .then((response) => {
-      expect(response).toEqual(mockResponse);
-    });
+
+  const response = await test.postWithUrlEncodedBody(
+    { query: 'params' },
+    { p1: 'd1', p2: 'a b' }
+  );
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a put method', () => {
+test('Pretend should call a put method', async () => {
   const test: Test = Pretend.builder().target(TestImpl, 'http://host:port');
   nock('http://host:port/').put('/path').reply(200, mockResponse);
-  return test.put().then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.put();
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a put method with query parameters', () => {
+test('Pretend should call a put method with query parameters', async () => {
   const test = setup();
   nock('http://host:port/').put('/path?query=param').reply(200, mockResponse);
-  return test.putWithQuery({ query: 'param' }).then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.putWithQuery({ query: 'param' });
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a delete method', () => {
+test('Pretend should call a delete method', async () => {
   const test = setup();
   nock('http://host:port/').delete('/path/id').reply(200, mockResponse);
-  return test.delete('id').then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.delete('id');
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should throw on error', () => {
+test('Pretend should throw on error', async () => {
   const test = setup();
   nock('http://host:port/').delete('/path/id').replyWithError('server-fail');
-  return test
-    .delete('id')
-    .then(() => {
-      fail('should throw');
-    })
-    .catch(() => {
-      // nothing to do here
-    });
+
+  try {
+    await test.delete('id');
+    fail('should throw');
+  } catch (e) {
+    // all good, nothing to do
+  }
 });
 
-test('Pretend should call a delete method and send a body', () => {
+test('Pretend should call a delete method and send a body', async () => {
   const test = setup();
   nock('http://host:port/')
     .delete('/path/id', { data: 'data' })
     .reply(200, mockResponse);
-  return test.deleteBody('id', { data: 'data' }).then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.deleteBody('id', { data: 'data' });
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a delete method and append query parameters', () => {
+test('Pretend should call a delete method and append query parameters', async () => {
   const test = setup();
   nock('http://host:port/')
     .delete('/path/id?param=value')
     .reply(200, mockResponse);
-  return test.deleteWithQuery('id', { param: 'value' }).then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.deleteWithQuery('id', { param: 'value' });
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should call a patch method and send a body', () => {
+test('Pretend should call a patch method and send a body', async () => {
   const test = setup();
   nock('http://host:port/')
     .patch('/path/id', { data: 'data' })
     .reply(200, mockResponse);
-  return test.patchBody('id', { data: 'data' }).then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+
+  const response = await test.patchBody('id', { data: 'data' });
+
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should return content based on decoder configuration', () => {
+test('Pretend should return content based on decoder configuration', async () => {
   /* tslint:disable */
   class Api {
     @Get('/path')
@@ -340,6 +354,7 @@ test('Pretend should return content based on decoder configuration', () => {
   }
   /* tslint:enable */
   nock('http://host:port/').get('/path').reply(200, 'some-string');
+
   let decoderCalled = false;
   const api = Pretend.builder()
     .decode((res: Response) => {
@@ -348,13 +363,13 @@ test('Pretend should return content based on decoder configuration', () => {
     })
     .target(Api, 'http://host:port/');
 
-  return api.get().then((text) => {
-    expect(decoderCalled).toBeTruthy();
-    expect(text).toBe('some-string');
-  });
+  const text = await api.get();
+
+  expect(decoderCalled).toBeTruthy();
+  expect(text).toBe('some-string');
 });
 
-test('Pretend should use basic auth if configured', () => {
+test('Pretend should use basic auth if configured', async () => {
   /* tslint:disable */
   class Api {
     @Get('/')
@@ -374,12 +389,13 @@ test('Pretend should use basic auth if configured', () => {
   const api = Pretend.builder()
     .basicAuthentication('Aladdin', 'OpenSesame')
     .target(Api, 'http://host:port');
-  return api.get().then((response) => {
-    expect(response).toEqual({});
-  });
+
+  const response = await api.get();
+
+  expect(response).toEqual({});
 });
 
-test('Pretend should return from the interceptor', () => {
+test('Pretend should return from the interceptor', async () => {
   nock('http://host:port/')
     .get('/path/id')
     .reply(200, mockResponse)
@@ -395,33 +411,36 @@ test('Pretend should return from the interceptor', () => {
       return firstReponse;
     })
     .target(TestImpl, 'http://host:port/');
+
   // first call gets through
-  return test
-    .get('id')
-    .then(() => test.get('id'))
-    .then((response) => {
-      // second should be return from the interceptor (nock would fail)
-      expect(response).toEqual(mockResponse);
-    });
+  await test.get('id');
+  const response = await test.get('id');
+
+  // second should be return from the interceptor (nock would fail)
+  expect(response).toEqual(mockResponse);
 });
 
-test('Pretend should reset per-request data after each request', () => {
+test('Pretend should reset per-request data after each request', async () => {
   const test = setup();
   nock('http://host:port/').get('/with/header').reply(200, mockResponse);
-  return test.getWithHeader().then(() => {
-    expect((test as any).__Pretend__.perRequest).toBeUndefined();
-  });
+
+  await test.getWithHeader();
+
+  expect((test as any).__Pretend__.perRequest).toBeUndefined();
 });
 
-test('Pretend should reset per-request data after error requests', () => {
+test('Pretend should reset per-request data after error requests', async () => {
   const test = setup();
   nock('http://host:port/').get('/with/header').replyWithError('failed');
-  return test.getWithHeader().catch(() => {
+
+  try {
+    await test.getWithHeader();
+  } catch (e) {
     expect((test as any).__Pretend__.perRequest).toBeUndefined();
-  });
+  }
 });
 
-test('Pretend should return from the interceptor with multiple chain calls', () => {
+test('Pretend should return from the interceptor with multiple chain calls', async () => {
   nock('http://host:port/')
     .get('/path/id')
     .reply(200, mockResponse)
@@ -434,7 +453,7 @@ test('Pretend should return from the interceptor with multiple chain calls', () 
     })
     .target(TestImpl, 'http://host:port/');
 
-  return test.get('id').then((response) => {
-    expect(response).toEqual(mockResponse);
-  });
+  const response = await test.get('id');
+
+  expect(response).toEqual(mockResponse);
 });
