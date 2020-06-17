@@ -1,3 +1,1 @@
-module.exports = {
-  mergeStrategy: { toSameBranch: ["master"] },
-};
+module.exports = {};
