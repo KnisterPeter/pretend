@@ -1,3 +1,17 @@
+# [3.1.0](https://github.com/KnisterPeter/pretend/compare/v3.0.2...v3.1.0) (2020-06-22)
+
+
+### Bug Fixes
+
+* remove mergeStrategy ([#532](https://github.com/KnisterPeter/pretend/issues/532)) ([5aa1537](https://github.com/KnisterPeter/pretend/commit/5aa15375744393ba100911e84cad6f8b8dff379d))
+
+
+### Features
+
+* add data mapping ([#530](https://github.com/KnisterPeter/pretend/issues/530)) ([bf5440a](https://github.com/KnisterPeter/pretend/commit/bf5440a31a50ed9a3fa29ba743001c744cbf7eaa)), closes [#515](https://github.com/KnisterPeter/pretend/issues/515)
+
+
+
 ## [3.0.2](https://github.com/KnisterPeter/pretend/compare/v3.0.1...v3.0.2) (2020-06-15)
 
 
