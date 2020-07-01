@@ -41,7 +41,7 @@
     "shipjs": "0.20.1",
     "ts-jest": "26.1.1",
     "tslint": "6.1.2",
-    "typescript": "3.9.5"
+    "typescript": "3.9.6"
   },
   "optionalDependencies": {
     "isomorphic-fetch": "2.2.1",
