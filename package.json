@@ -34,7 +34,7 @@
     "codecov": "3.8.0",
     "isomorphic-fetch": "3.0.0",
     "isomorphic-form-data": "2.0.0",
-    "jest": "26.6.0",
+    "jest": "26.6.1",
     "nock": "13.0.4",
     "prettier": "2.1.2",
     "rimraf": "3.0.2",
