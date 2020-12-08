@@ -29,7 +29,7 @@
   "license": "MIT",
   "devDependencies": {
     "@knisterpeter/standard-tslint": "1.7.2",
-    "@types/jest": "26.0.16",
+    "@types/jest": "26.0.17",
     "@types/node": "10.17.17",
     "codecov": "3.8.1",
     "isomorphic-fetch": "3.0.0",
