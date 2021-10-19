@@ -174,11 +174,11 @@ function execute(
       const body = args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex];
       return createQuery(body).substr(1);
     }
-    return sendBody
-      ? JSON.stringify(
-          args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex]
-        )
-      : undefined;
+    if (sendBody){
+      const body = args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex];
+      return body instanceof FormData ? body : JSON.stringify(body);
+    }
+    return undefined;
   };
   const urlParams = filterFormData(args, parameters);
   const createUrlResult = buildUrl(tmpl, urlParams, appendQuery);
