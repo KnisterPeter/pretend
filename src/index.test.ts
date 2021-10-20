@@ -5,7 +5,7 @@ import nock from 'nock';
 import { FormEncoding, ResponseType } from './decorators';
 import {
   Delete,
-  FormData,
+  FormData as FormDataParam,
   Get,
   Headers,
   Patch,
@@ -80,20 +80,20 @@ class TestImpl implements Test {
     /* */
   }
   @Post('/path/withFormData', true)
-  public postWithFormData(@FormData('name') _formData: any): any {
+  public postWithFormData(@FormDataParam('name') _formData: any): any {
     /* */
   }
   @Post('/path/withFormData', true)
   public postWithFormDataAndQuery(
     _query: any,
-    @FormData('name') _formData: any
+    @FormDataParam('name') _formData: any
   ): any {
     /* */
   }
   @Post('/path/withFormData', true)
   public postWithEmptyFormDataAndQuery(
     _query: any,
-    @FormData('name') _formData: any
+    @FormDataParam('name') _formData: any
   ): any {
     /* */
   }
@@ -514,4 +514,24 @@ test('Pretend should map responses to a given result type using a transform', as
   expect(response.user).toBe('firstname lastname');
 
   scope.done();
+});
+
+test('Pretend should call a post method with FormData body', async () => {
+  const test = setup();
+
+  const formData = new FormData();
+  formData.append('name', Buffer.alloc(10).toString('UTF-8'));
+  nock('http://host:123/', {
+    reqheaders: {
+      'Content-Type': /^multipart\/form-data/
+    }
+  })
+    .post('/path', /Content-Disposition: form-data; name="name"/)
+    .reply(200, mockResponse);
+
+  const response = await test.post(
+    formData
+  );
+
+  expect(response).toEqual(mockResponse);
 });

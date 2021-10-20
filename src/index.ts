@@ -154,6 +154,10 @@ function execute(
   appendQuery: boolean,
   parameters?: FormParameter[]
 ): Promise<any> {
+  const getBody = () => {
+    const body = args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex];
+    return body instanceof FormData ? body : JSON.stringify(body);
+  }
   const createBody = () => {
     if (parameters) {
       if (parameters.some((parameter) => parameter.type === 'FormData')) {
@@ -174,9 +178,8 @@ function execute(
       const body = args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex];
       return createQuery(body).substr(1);
     }
-    if (sendBody){
-      const body = args[appendQuery ? queryOrBodyIndex + 1 : queryOrBodyIndex];
-      return body instanceof FormData ? body : JSON.stringify(body);
+    if (sendBody) {
+      return getBody();
     }
     return undefined;
   };
