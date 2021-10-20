@@ -521,7 +521,7 @@ test('Pretend should call a post method with FormData body', async () => {
 
   const formData = new FormData();
   formData.append('name', Buffer.alloc(10).toString('UTF-8'));
-  nock('http://host:123/', {
+  nock('http://host:port/', {
     reqheaders: {
       'Content-Type': /^multipart\/form-data/
     }
