@@ -1,3 +1,7 @@
+## [3.1.1](https://github.com/KnisterPeter/pretend/compare/v3.1.0...v3.1.1) (2021-10-22)
+
+
+
 # [3.1.0](https://github.com/KnisterPeter/pretend/compare/v3.0.2...v3.1.0) (2020-06-22)
 
 
