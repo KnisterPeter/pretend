@@ -30,7 +30,7 @@
   "devDependencies": {
     "@knisterpeter/standard-tslint": "1.7.2",
     "@types/jest": "27.0.2",
-    "@types/node": "10.17.60",
+    "@types/node": "14.17.31",
     "codecov": "3.8.3",
     "isomorphic-fetch": "3.0.0",
     "isomorphic-form-data": "2.0.0",
