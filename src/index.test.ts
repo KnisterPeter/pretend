@@ -243,7 +243,7 @@ test('Pretend should call a post method with FormData', async () => {
     .reply(200, mockResponse);
 
   const response = await test.postWithFormData(
-    Buffer.alloc(10).toString('UTF-8')
+    Buffer.alloc(10).toString('utf-8')
   );
 
   expect(response).toEqual(mockResponse);
@@ -264,7 +264,7 @@ test('Pretend should call a post method with FormData and query', async () => {
 
   const response = await test.postWithFormDataAndQuery(
     { query: 'params' },
-    Buffer.alloc(10).toString('UTF-8')
+    Buffer.alloc(10).toString('utf-8')
   );
 
   expect(response).toEqual(mockResponse);
@@ -520,7 +520,7 @@ test('Pretend should call a post method with FormData body', async () => {
   const test = setup();
 
   const formData = new FormData();
-  formData.append('name', Buffer.alloc(10).toString('UTF-8'));
+  formData.append('name', Buffer.alloc(10).toString('utf-8'));
   nock('http://host:port/', {
     reqheaders: {
       'Content-Type': /^multipart\/form-data/
@@ -529,9 +529,7 @@ test('Pretend should call a post method with FormData body', async () => {
     .post('/path', /Content-Disposition: form-data; name="name"/)
     .reply(200, mockResponse);
 
-  const response = await test.post(
-    formData
-  );
+  const response = await test.post(formData);
 
   expect(response).toEqual(mockResponse);
 });
