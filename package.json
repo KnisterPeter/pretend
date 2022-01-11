@@ -35,7 +35,7 @@
     "isomorphic-fetch": "3.0.0",
     "isomorphic-form-data": "2.0.0",
     "jest": "27.4.7",
-    "nock": "13.2.1",
+    "nock": "13.2.2",
     "prettier": "2.5.1",
     "rimraf": "3.0.2",
     "shipjs": "0.24.1",
