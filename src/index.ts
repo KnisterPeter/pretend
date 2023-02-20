@@ -170,7 +170,13 @@ function execute(
           .forEach((parameter: FormDataParameter) => {
             const value = args[parameter.parameter];
             if (value) {
-              formData.append(parameter.name, value, value.name);
+              if (Array.isArray(value)) {
+                value.forEach(val => {
+                  formData.append(parameter.name, val, val.name);
+                });
+              } else {
+                formData.append(parameter.name, value, value.name);
+              }
             }
           });
         return formData;
